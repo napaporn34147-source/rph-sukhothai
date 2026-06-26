@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แบบประเมินสมรรถนะหลัก — โรงพยาบาลสุโขทัย</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%}
+body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size:15px}
+.app{max-width:100%;margin:0 auto;padding:20px;box-sizing:border-box}
+.hdr{background:#1B3A6B;border-radius:12px;padding:18px 22px;margin-bottom:12px;color:#fff}
+.hdr h1{font-size:16px;font-weight:600}
+.hdr p{font-size:12px;opacity:.75;margin-top:4px}
+.steps{display:flex;gap:6px;margin-bottom:10px}
+.sb{flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;background:#fff;border-radius:8px;font-size:11px;color:#6B7280;cursor:pointer;text-align:center;transition:all .2s;font-family:'Sarabun',sans-serif}
+.sb.active{border-color:#1B3A6B;background:#EFF6FF;color:#1B3A6B;font-weight:600}
+.sb.done{border-color:#1D9E75;color:#1D9E75}
+.prog{background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:10px;border:1px solid #E5E7EB}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:#6B7280;margin-bottom:6px}
+.prog-track{height:5px;background:#E5E7EB;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width .5s}
+.card{background:#fff;border-radius:12px;border:1px solid #E5E7EB;margin-bottom:10px;overflow:hidden}
+.card-pad{padding:16px 18px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;font-weight:600;color:#6B7280}
+.field input,.field select{padding:9px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-size:13px;background:#fff;color:#111827;font-family:'Sarabun',sans-serif;outline:none;transition:border-color .2s;width:100%}
+.field input:focus,.field select:focus{border-color:#1B3A6B}
+.full{grid-column:1/-1}
+.comp-hdr{padding:12px 18px 8px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:10px}
+.comp-name{font-size:13px;font-weight:600}
+.comp-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.lv-block{border-bottom:1px solid #F3F4F6}
+.lv-block:last-child{border-bottom:none}
+.lv-bar{display:flex;align-items:center;justify-content:space-between;padding:9px 18px}
+.lv-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600}
+.badge{font-size:10px;padding:2px 9px;border-radius:10px;font-weight:600}
+.b1{background:#EFF6FF;color:#1E3A8A}
+.b2{background:#E1F5EE;color:#065F46}
+.b3{background:#F5F3FF;color:#4C1D95}
+.lv-locked{display:flex;align-items:center;gap:6px;font-size:11px;color:#9CA3AF;padding:9px 18px 11px;background:#F9FAFB}
+.ind-row{display:flex;align-items:flex-start;gap:12px;padding:9px 18px;border-top:1px solid #F3F4F6;transition:background .15s}
+.ind-row.tk1{background:#F0FDFA}
+.ind-row.tk2{background:#F5F3FF}
+.ind-row.tk3{background:#FFF7ED}
+.chk{width:18px;height:18px;cursor:pointer;flex-shrink:0;margin-top:2px;accent-color:#1D9E75}
+.ind-name{font-size:12px;font-weight:600;color:#111827}
+.ind-desc{font-size:11px;color:#6B7280;margin-top:2px;line-height:1.5}
+.score-row{display:flex;align-items:center;gap:8px;padding:8px 18px;background:#F9FAFB}
+.score-lbl{font-size:11px;color:#6B7280;min-width:54px}
+.pills{display:flex;gap:5px;flex-wrap:wrap}
+.pill{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600}
+.pp{background:#DCFCE7;color:#14532D}
+.pf{background:#FEF2F2;color:#991B1B}
+.pl{background:#E5E7EB;color:#9CA3AF}
+.banner{margin:6px 18px;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;display:none;align-items:center;gap:6px}
+.bok{background:#DCFCE7;color:#14532D;border:1px solid #86EFAC}
+.bno{background:#FEF9C3;color:#713F12;border:1px solid #FDE047}
+.sum-box{background:#F9FAFB;border-radius:8px;padding:10px 14px;margin-bottom:10px}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;border-bottom:1px solid #E5E7EB}
+.sum-row:last-child{border-bottom:none}
+.tpass{color:#14532D;font-weight:600}
+.tfail{color:#991B1B;font-weight:600}
+.res-box{border-radius:10px;padding:14px 16px;margin-bottom:10px;border:1.5px solid}
+.res-ok{background:#DCFCE7;border-color:#16A34A}
+.res-no{background:#FEF9C3;border-color:#CA8A04}
+.action-bar{background:#fff;border-radius:12px;padding:14px 18px;border:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:4px}
+.btn-pri{padding:11px 24px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Sarabun',sans-serif;transition:opacity .2s}
+.btn-pri:hover{opacity:.88}
+.btn-pri:disabled{background:#9CA3AF;cursor:not-allowed}
+.btn-sec{padding:11px 16px;background:#F3F4F6;color:#6B7280;border:1.5px solid #D1D5DB;border-radius:8px;font-size:13px;cursor:pointer;font-family:'Sarabun',sans-serif}
+.note{font-size:11px;color:#9CA3AF}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:28px 32px;max-width:380px;width:90%;text-align:center}
+.modal h2{font-size:18px;margin-bottom:8px}
+.modal p{font-size:13px;color:#6B7280;line-height:1.6;margin-bottom:18px}
+.spin{width:40px;height:40px;border:4px solid #E5E7EB;border-top-color:#1B3A6B;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:600px){.fgrid{grid-template-columns:1fr}.steps .sb{font-size:9px;padding:6px 2px}}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="app"><div style="max-width:900px;margin:0 auto">
+
+<div class="hdr">
+  <h1>🏥 แบบประเมินสมรรถนะหลัก — โรงพยาบาลสุโขทัย</h1>
+  <p>Core Competency Assessment · ปีงบประมาณ 2569</p>
+</div>
+
+<div class="steps">
+  <button class="sb active" onclick="goStep(0)" id="sb0">1. ข้อมูลส่วนตัว</button>
+  <button class="sb" onclick="goStep(1)" id="sb1">2. ประเมินตนเอง</button>
+  <button class="sb" onclick="goStep(2)" id="sb2">3. สรุปผล</button>
+</div>
+
+<div class="prog">
+  <div class="prog-row"><span id="prog-txt">กรอกข้อมูลส่วนตัวก่อนเริ่มประเมิน</span><span id="prog-pct">0%</span></div>
+  <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<!-- PAGE 0: ข้อมูลส่วนตัว -->
+<div id="p0">
+  <div class="card card-pad">
+    <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:10px">ข้อมูลบุคลากร</div>
+    <div class="fgrid">
+      <div class="field"><label>รหัสบุคลากร *</label><input id="fi" placeholder="เช่น 10234"></div>
+      <div class="field"><label>คำนำหน้า *</label>
+        <select id="fp"><option value="">เลือก</option><option>นาย</option><option>นาง</option><option>นางสาว</option></select></div>
+      <div class="field"><label>ชื่อ *</label><input id="ff" placeholder="ชื่อจริง"></div>
+      <div class="field"><label>นามสกุล *</label><input id="fl" placeholder="นามสกุล"></div>
+      <div class="field full"><label>หน่วยงาน *</label>
+        <select id="fd">
+          <option value="">— เลือกหน่วยงาน —</option>
+          <option>องค์กรแพทย์</option><option>OPD งานกระตุ้นพัฒนาการเด็ก</option>
+          <option>OPD จิตเวช</option><option>OPD บริการปรึกษาสุขภาพ</option>
+          <option>OPD ผู้ป่วยนอก</option><option>OPD คลินิกฝากครรภ์</option>
+          <option>OPD จักษุ</option><option>OPD โสต ศอ นาสิก</option>
+          <option>กลุ่มงานกายภาพบำบัด</option><option>กลุ่มงานการเงิน</option>
+          <option>กลุ่มงานการแพทย์แผนไทยและแพทย์ทางเลือก</option>
+          <option>กลุ่มงานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์</option>
+          <option>กลุ่มงานจิตเวชและยาเสพติด</option><option>กลุ่มงานทรัพยากรบุคคล</option>
+          <option>กลุ่มงานทันตกรรม</option><option>กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก</option>
+          <option>กลุ่มงานบริหารทั่วไป</option><option>กลุ่มงานบัญชี</option>
+          <option>กลุ่มงานประกันสุขภาพ</option><option>กลุ่มงานพยาธิวิทยากายวิภาค</option>
+          <option>กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน</option>
+          <option>กลุ่มงานพัฒนาทรัพยากรบุคคล</option><option>กลุ่มงานพัสดุ</option>
+          <option>กลุ่มงานโภชนศาสตร์</option><option>กลุ่มงานยุทธศาสตร์และแผนงานโครงการ</option>
+          <option>กลุ่มงานรังสีวิทยา</option><option>กลุ่มงานเวชกรรมฟื้นฟู</option>
+          <option>กลุ่มงานเวชกรรมสังคม</option><option>กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์</option>
+          <option>กลุ่มงานสังคมสงเคราะห์</option><option>กลุ่มงานสุขศึกษา</option>
+          <option>กลุ่มงานอาชีวเวชกรรม</option><option>งานจ่ายกลาง</option>
+          <option>งานเปล</option><option>งานวิสัญญีพยาบาล</option>
+          <option>งานห้องคลอด</option><option>งานห้องผ่าตัด</option>
+          <option>งานอุบัติเหตุและฉุกเฉิน</option><option>ไตเทียม</option>
+          <option>เภสัชกรรม IPD</option><option>เภสัชกรรม OPD</option>
+          <option>เภสัชกรรมสารสนเทศ</option><option>เภสัชกรรมห้องคลัง</option>
+          <option>เภสัชกรรมห้องผลิต</option><option>ศูนย์เครื่องมือแพทย์</option>
+          <option>ศูนย์พนักงานทำความสะอาด</option><option>สำนักงานการพยาบาล</option>
+          <option>หอผู้ป่วยกุมารเวชกรรมชั้น 3</option><option>หอผู้ป่วยกุมารเวชกรรมชั้น 4</option>
+          <option>หอผู้ป่วยจักษุ</option><option>หอผู้ป่วยจิตเวชและยาเสพติด</option>
+          <option>หอผู้ป่วยพิเศษจิตเมตตาชั้น 5-6</option>
+          <option>หอผู้ป่วยพิเศษประชาร่วมใจชั้น 5</option>
+          <option>หอผู้ป่วยพิเศษประชาร่วมใจชั้น 6</option>
+          <option>หอผู้ป่วยศัลยกรรมกระดูก</option><option>หอผู้ป่วยศัลยกรรมชาย</option>
+          <option>หอผู้ป่วยศัลยกรรมหญิง</option><option>หอผู้ป่วยสูติ-นรีเวชกรรม</option>
+          <option>หอผู้ป่วยอายุรกรรมชาย</option><option>หอผู้ป่วยอายุรกรรมหญิง</option>
+          <option>หออภิบาลผู้ป่วยวิกฤตโรคหลอดเลือดสมอง</option>
+          <option>หออภิบาลผู้ป่วยวิกฤตศัลยกรรม</option>
+          <option>หออภิบาลผู้ป่วยวิกฤตอายุรกรรม</option>
+          <option>IC/TB clinic</option>
+        </select></div>
+      <div class="field"><label>อายุงาน (ปี) *</label>
+        <input id="fe" type="number" min="0" max="50" step="0.5" placeholder="เช่น 3.5"></div>
+      <div class="field full"><label>ผู้บังคับบัญชา *</label>
+        <select id="fs">
+          <option value="">— เลือกผู้บังคับบัญชา —</option>
+          <optgroup label="กลุ่มภารกิจ">
+            <option>นางกนกพจน์ มีวัฒนา</option>
+            <option>นายปรีชา ภิญโญพรพาณิชย์</option>
+            <option>นางรตินันทน์ เตชะสืบ</option>
+            <option>นายพงศ์กฤช เนียมหุ่น</option>
+            <option>นางรุ่งทิพย์ พงศ์กิจการเจริญ</option>
+            <option>นายครรชิต สุวรรณาลัย</option>
+            <option>นายเสถียรพงศ์ ตรีกุย</option>
+          </optgroup>
+          <optgroup label="หัวหน้ากลุ่มงาน">
+            <option>นางศุภานัน ปานประภากร</option><option>นายวสุธนวรรธน์ เอี่ยมประพันธ์</option>
+            <option>นางสาวศิริวรรณ คะเนนอก</option><option>นางวรางคณา วสุรัตน์</option>
+            <option>นางสาวชนม์พรรษ์ ลิปิกรโกศล</option><option>นางกัญญา คงเจริญ</option>
+            <option>นางสาวมาลี ด้วงพรม</option><option>นางสาวณัฐยาภรณ์ ทรงธรรม</option>
+            <option>นางศุภพร ไพรอุดม</option><option>นางพัชรี ชัยวัฒนกุล</option>
+            <option>นางภัทราวรรณ ศิรินันทยา</option><option>นางทัศนีย์ แสงเงิน</option>
+            <option>นางสาวฐิติมา ขอบเขตต์</option><option>นางสาวทิพารัตน์ หมื่นมะโน</option>
+            <option>นางอภัณตรี อินสอน</option><option>นางชูจิตร วงศ์คำ</option>
+            <option>นางมยุรี มะโนวรรณ์</option><option>นางสาวอำพัน วินิยม</option>
+            <option>นางนุจรี นิช่างทอง</option><option>นางเพ็ญพรรณ วัฒนา</option>
+            <option>นางสาวกาญจนา พยัคฆ์</option><option>นางสาวอานุภาพ กันทะวงค์</option>
+            <option>นางพรรณราย สายเนตร</option><option>นางสาวพัชรี กระชั้น</option>
+            <option>นางสถาพร จูทอง</option><option>นางดิฐี ไชยเพชร</option>
+            <option>นายธเนศ แตกฉาน</option><option>นางวารุณีย์ อภิวงศ์สุวรรณ</option>
+            <option>นางสาวสโรบล อยู่สำราญ</option><option>นางสาวสุนทรีย์ ลื้อยอด</option>
+            <option>นายสมชาย เขียวริด</option><option>นายฉลอง จันทร์พะโยม</option>
+            <option>นางณัฐพร เนียมหุ่น</option><option>นายณัฐวุฒิ สินสุวรรณ</option>
+            <option>นายสุเปรม หนูเมือง</option><option>นางสาววราพรรณ บุญคง</option>
+            <option>นางอรอุมา นันทา</option><option>นายจารุบุตร พิสุทธิ์รัตนาภรณ์</option>
+            <option>นายรุ่ง ทานะมัย</option><option>นางศิริรัตน์ ศิรินวล</option>
+            <option>นางสาวสุมาลี กุละพัฒน์</option><option>นายจิณณะ ศรีแจ่มดี</option>
+            <option>นางสาวอุไร ชาญตระกูล</option><option>นางทิพสุดา อู่วุฒิพงษ์</option>
+            <option>นางพรรณวิภา แจ่มทุ่ง</option><option>นางวิมล อินสวน</option>
+            <option>นางสาวประไพรัตน์ เหมราช</option><option>นางสาวสุทัชชา ฉัตรไชยาฤกษ์</option>
+            <option>นางมีนา นาคร</option><option>นายสุพัฒน์ ปัญญานุกุล</option>
+            <option>นายพิเศษ อินสวน</option><option>นายสาธิต พรพัฒนารักษ์</option>
+            <option>นางพรรณนิภา ช่วยเพ็ญ</option><option>นายเกริกชัย บูชาเกียรติ</option>
+            <option>นางณินญาภร ใจยอด</option><option>นายกวิน ก้านแก้ว</option>
+            <option>นายเชิดศักดิ์ ศักดิ์ลอ</option><option>นายบัณฑิต ฉิมอำพันธ์</option>
+          </optgroup>
+          <optgroup label="หัวหน้าหอ/งาน">
+            <option>นางนวลพรรณ จิ๋วปัญญา</option><option>นางสาววรรณริชฎา กิตติธงโสภณ</option>
+            <option>นางเกษนภา กิ่งก้าน</option><option>นางสุณัฏฐา อิ่มเอม</option>
+            <option>นางวันทนีย์ พีธรากร</option><option>นางกัลยาณี ตรีธรรมพินิจ</option>
+            <option>นายบุญช่วย เรืองคำ</option><option>นางสาวศิริลักษณ์ อุปวาณิช</option>
+            <option>นางภาวีนัส คำพวง</option>
+          </optgroup>
+        </select></div>
+    </div>
+  </div>
+  <div class="action-bar">
+    <span class="note">* จำเป็นต้องกรอกทุกช่อง</span>
+    <button class="btn-pri" onclick="next(0)">ถัดไป →</button>
+  </div>
+</div>
+
+<!-- PAGE 1: ประเมินตนเอง -->
+<div id="p1" style="display:none">
+  <div id="comp-wrap"></div>
+  <div class="action-bar">
+    <button class="btn-sec" onclick="goStep(0)">← ย้อนกลับ</button>
+    <button class="btn-pri" onclick="next(1)">ดูสรุปผล →</button>
+  </div>
+</div>
+
+<!-- PAGE 2: สรุปผล -->
+<div id="p2" style="display:none">
+  <div id="sum-wrap"></div>
+  <div class="action-bar">
+    <button class="btn-sec" onclick="goStep(1)">← ย้อนกลับ</button>
+    <button class="btn-pri" id="btn-submit" onclick="submitData()">✓ บันทึกส่งผู้บังคับบัญชา</button>
+  </div>
+</div>
+
+<!-- Loading -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="spin"></div>
+    <h2>กำลังบันทึกข้อมูล...</h2>
+    <p>กรุณารอสักครู่</p>
+  </div>
+</div>
+
+<!-- Success -->
+<div class="overlay" id="success-overlay">
+  <div class="modal">
+    <div style="font-size:48px;margin-bottom:12px">✅</div>
+    <h2>ส่งแบบประเมินสำเร็จ!</h2>
+    <p>ผู้บังคับบัญชาจะได้รับทราบผลการประเมินของท่านผ่านระบบ</p>
+    <button class="btn-pri" onclick="resetForm()" style="width:100%;margin-top:4px">ปิด</button>
+  </div>
+</div>
+
+</div>
+</div>
+<script>
+// ⚠️ ใส่ URL Apps Script ที่ Deploy แล้ว
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyGeW1437wSxSUXd1vBmOzvPnKpyQCPBnHE3m8qeYlDKzd33zDPFmc9NgFbnU0pVh6e/exec';
+
+const COMPS = [
+  {id:'c1',name:'1. การทำงานที่เป็นเลิศ',en:'Achieving Work Excellence',dot:'#1D9E75',
+   lv1:[
+     {id:'c1l1i1',n:'ความรับผิดชอบและเวลา',d:'ดำเนินงานที่ได้รับมอบหมายให้แล้วเสร็จถูกต้อง ครบถ้วน ตามมาตรฐาน ภายในเวลาที่กำหนด'},
+     {id:'c1l1i2',n:'การใช้งานระบบสารสนเทศ',d:'ใช้งานระบบ IT พื้นฐานของโรงพยาบาลได้อย่างถูกต้องโดยไม่ต้องมีผู้ควบคุม'},
+     {id:'c1l1i3',n:'การใช้โปรแกรมสำนักงาน',d:'ใช้ Microsoft Office หรือระบบ HIS (HOSxPXE) ในขอบเขตงานประจำได้คล่องตัว'},
+     {id:'c1l1i4',n:'การพัฒนาตนเอง',d:'ทบทวนข้อผิดพลาด ใฝ่หาความรู้เพิ่มเติม พัฒนาทักษะการทำงานสม่ำเสมอ'},
+     {id:'c1l1i5',n:'การวางตัว',d:'ควบคุมอารมณ์และวางตัวได้อย่างสุภาพ เหมาะสมกับสถานการณ์หน้างาน'},
+   ],
+   lv2:[
+     {id:'c1l2i1',n:'การดูแลทีมงาน',d:'รับผิดชอบงานหลัก พร้อมกำกับดูแล แนะนำ และถ่ายทอดงานให้ทีมงาน'},
+     {id:'c1l2i2',n:'การใช้หลักวิชาการ',d:'ประยุกต์ใช้องค์ความรู้ กฎระเบียบ มาแก้ปัญหาได้ถูกต้องเหมาะสม'},
+     {id:'c1l2i3',n:'การจัดลำดับงาน',d:'ระบุเป้าหมาย วิเคราะห์ภาพรวม จัดลำดับความสำคัญของงานซับซ้อนได้'},
+     {id:'c1l2i4',n:'การวิเคราะห์ข้อมูล',d:'รวบรวมและวิเคราะห์ข้อมูลรอบด้านเพื่อประกอบการตัดสินใจได้'},
+     {id:'c1l2i5',n:'ความกล้าแสดงออก',d:'กล้าแสดงความเห็นและยืนหยัดตามหลักวิชาชีพในกลุ่มงาน'},
+   ],
+   lv3:[
+     {id:'c1l3i1',n:'การเป็นที่ปรึกษา',d:'ให้คำปรึกษาแก้ปัญหางานที่ยุ่งยากซับซ้อนได้อย่างแม่นยำ'},
+     {id:'c1l3i2',n:'การตั้งเป้าหมายเชิงท้าทาย',d:'กำหนดเป้าหมายเพื่อยกระดับผลงานของหน่วยงานให้โดดเด่น'},
+     {id:'c1l3i3',n:'การนำเสนอผลงานวิชาการ',d:'มีส่วนร่วมในการนำเสนอผลงาน R2R/CQI อย่างน้อยปีละ 1 ครั้ง'},
+     {id:'c1l3i4',n:'การใช้ข้อมูลวิเคราะห์งาน',d:'นำข้อมูลจากระบบสารสนเทศมาพัฒนางานเชิงระบบได้'},
+     {id:'c1l3i5',n:'การตัดสินใจภายใต้แรงกดดัน',d:'ตัดสินใจแก้ปัญหาได้รวดเร็วและแม่นยำแม้อยู่ในสถานการณ์กดดัน'},
+   ]},
+  {id:'c2',name:'2. การยึดมั่นในความถูกต้องฯ',en:'Serving the Public with Integrity',dot:'#0D9488',
+   lv1:[
+     {id:'c2l1i1',n:'วินัยเวลา',d:'ลงเวลาปฏิบัติงาน ขึ้นเวร และสลับเวรอย่างถูกต้อง ตรงต่อเวลาตามที่ รพ. กำหนด'},
+     {id:'c2l1i2',n:'จริยธรรมพื้นฐาน',d:'ปฏิบัติตนตามกฎ ระเบียบ ข้อบังคับ และวัฒนธรรมองค์กรอย่างเคร่งครัด'},
+     {id:'c2l1i3',n:'ความเข้าอกเข้าใจ',d:'เคารพความรู้สึกผู้อื่น เปิดใจรับฟัง พร้อมช่วยเหลือผู้รับบริการ/ผู้ป่วย'},
+     {id:'c2l1i4',n:'จิตสาธารณะ',d:'ไม่นิ่งดูดายต่อข้อร้องเรียน เข้าร่วมกิจกรรมจิตสาธารณะขององค์กร'},
+     {id:'c2l1i5',n:'ความรับผิดชอบ',d:'รับผิดชอบในหน้าที่ที่ได้รับมอบหมายต่อองค์กรอย่างครบถ้วน'},
+   ],
+   lv2:[
+     {id:'c2l2i1',n:'การช่วยเหลือเกื้อกูล',d:'ปฏิบัติด้วยความเป็นมิตร มีน้ำใจ เอื้อเฟื้อ ไม่เบียดเบียนผู้อื่น'},
+     {id:'c2l2i2',n:'การรักษากฎหมาย',d:'ปฏิบัติหน้าที่ตรงไปตรงมาตามมาตรฐานจริยธรรม กฎหมาย จรรยาบรรณวิชาชีพ'},
+     {id:'c2l2i3',n:'ทัศนคติเชิงบวก',d:'แสดงทัศนคติเชิงบวก สร้างความเข้าใจ ลดความขัดแย้ง'},
+     {id:'c2l2i4',n:'ความกล้ารับผิดรับชอบ',d:'กล้ารับผิดชอบ ไม่เบี่ยงเบนข้อมูลด้วยอคติ ยึดประโยชน์ส่วนรวม'},
+     {id:'c2l2i5',n:'การตระหนักรู้สังคม',d:'กระตุ้นให้รอบข้างตระหนักถึงประเด็นทางสังคม เช่น งดสูบบุหรี่ใน รพ.'},
+   ],
+   lv3:[
+     {id:'c2l3i1',n:'ยึดมั่นความถูกต้อง',d:'ไม่เบี่ยงเบนข้อมูลด้วยอคติหรือผลประโยชน์ ยึดประโยชน์ส่วนรวมเป็นหลัก'},
+     {id:'c2l3i2',n:'การสร้างบรรยากาศบริการ',d:'ส่งเสริมบรรยากาศเข้าอกเข้าใจในหน่วยงาน นำข้อร้องเรียนมาพัฒนา'},
+     {id:'c2l3i3',n:'การส่งเสริมจริยธรรม',d:'ยืนหยัดให้ทุกคนในหน่วยงานปฏิบัติตามมาตรฐานจริยธรรมอย่างเคร่งครัด'},
+     {id:'c2l3i4',n:'การวางแผนเชิงรุก',d:'วิเคราะห์ วางแผน กำหนดมาตรการสร้างความพึงพอใจและภาพลักษณ์ที่ดีให้องค์กร'},
+     {id:'c2l3i5',n:'การสร้างแรงบันดาลใจ',d:'เป็นแบบอย่าง ผลักดันให้เกิดโครงการหรือนโยบายเพื่อสังคมที่ยั่งยืน'},
+   ]},
+  {id:'c3',name:'3. การประสานความร่วมมือร่วมใจ',en:'Working Effectively Together',dot:'#7C3AED',
+   lv1:[
+     {id:'c3l1i1',n:'การเคารพความแตกต่าง',d:'ปฏิบัติต่อผู้อื่นอย่างเท่าเทียม ยอมรับความแตกต่างด้านเพศ วัย ศาสนา สถานะ'},
+     {id:'c3l1i2',n:'การสื่อสารที่ชัดเจน',d:'จับใจความสำคัญและสื่อสารส่งต่องานในทีมได้ถูกต้อง ชัดเจน ด้วยภาษาที่สุภาพ'},
+     {id:'c3l1i3',n:'การมีส่วนร่วม',d:'รับผิดชอบงานในส่วนของตนเองและให้ความร่วมมือในการทำงานเป็นทีมอย่างเต็มที่'},
+     {id:'c3l1i4',n:'การตระหนักรู้อารมณ์',d:'ควบคุมอารมณ์ตนเองและตอบสนองต่ออารมณ์ของผู้อื่นได้อย่างเหมาะสม'},
+     {id:'c3l1i5',n:'ความน่าเชื่อถือ',d:'รักษาคำพูด มีสัจจะ ไม่บิดเบือนข้อมูล หรืออ้างข้อยกเว้นเพื่อเอาตัวรอด'},
+   ],
+   lv2:[
+     {id:'c3l2i1',n:'การเห็นคุณค่าความต่าง',d:'สนับสนุนให้ทีมงานยอมรับและเห็นคุณค่าในความหลากหลายของบุคคล'},
+     {id:'c3l2i2',n:'การสื่อสารกระชับ',d:'สื่อสารประเด็นสำคัญได้กระชับ ตรงประเด็น ปรับรูปแบบให้เข้ากับผู้ฟังแต่ละกลุ่ม'},
+     {id:'c3l2i3',n:'การดึงศักยภาพทีม',d:'เปิดโอกาสให้มีส่วนร่วม ดึงศักยภาพทีมให้บรรลุเป้าหมายร่วมกัน'},
+     {id:'c3l2i4',n:'ความฉลาดทางอารมณ์ (EQ)',d:'เข้าใจความรู้สึกเพื่อนร่วมงาน สร้างและรักษาสัมพันธ์เชิงบวกในทีมได้'},
+     {id:'c3l2i5',n:'ความตรงไปตรงมา',d:'ปฏิบัติหน้าที่ปราศจากอคติหรือผลประโยชน์ส่วนตน'},
+   ],
+   lv3:[
+     {id:'c3l3i1',n:'การสร้างวัฒนธรรมองค์กร',d:'ผลักดันให้เกิดวัฒนธรรมที่เปิดรับความแตกต่างและส่งเสริมการมีส่วนร่วม'},
+     {id:'c3l3i2',n:'การโน้มน้าวใจ',d:'ใช้เทคนิคเจรจาเชิงกลยุทธ์ให้ผู้เกี่ยวข้องยอมรับข้อตกลงร่วมกันได้'},
+     {id:'c3l3i3',n:'การสร้างเครือข่าย',d:'แสวงหาโอกาสแลกเปลี่ยน สร้างเครือข่ายทั้งภายในและภายนอกหน่วยงาน'},
+     {id:'c3l3i4',n:'การนำทีมให้สำเร็จ',d:'นำทีมปฏิบัติภารกิจให้บรรลุเป้าหมายสูงสุดแม้ในสถานการณ์กดดัน'},
+     {id:'c3l3i5',n:'การเป็นส่วนหนึ่งขององค์กร',d:'สร้างสภาพแวดล้อมให้ทีมงานรู้สึกเป็นส่วนหนึ่งขององค์กร'},
+   ]},
+  {id:'c4',name:'4. ความยืดหยุ่น คล่องตัว ริเริ่มสร้างสรรค์',en:'Being Agile and Innovative',dot:'#EA580C',
+   lv1:[
+     {id:'c4l1i1',n:'การพัฒนาตนเอง',d:'วิเคราะห์ศักยภาพตนเอง ยอมรับข้อผิดพลาด นำความเห็นต่างมาปรับปรุง'},
+     {id:'c4l1i2',n:'ข้อเสนอแนะเชิงสร้างสรรค์',d:'เสนอไอเดียหรือแนวทางพัฒนาวิธีการทำงานใหม่ๆ อย่างสร้างสรรค์'},
+     {id:'c4l1i3',n:'การปรับตัว',d:'ยืดหยุ่นและพร้อมปรับตัวเข้ากับสถานการณ์ หน้างาน หรือระเบียบปฏิบัติใหม่ๆ'},
+     {id:'c4l1i4',n:'การประเมินความเสี่ยง',d:'ระบุปัจจัยเสี่ยงที่อาจเกิดขึ้นในงาน และเสนอแนวทางป้องกันเบื้องต้นได้'},
+     {id:'c4l1i5',n:'การทำงานภายใต้แรงกดดัน',d:'รักษาระดับมาตรฐานการทำงานได้ดี แม้เผชิญปัญหาหรืออยู่ภายใต้ภาวะกดดัน'},
+   ],
+   lv2:[
+     {id:'c4l2i1',n:'การให้ข้อเสนอแนะ',d:'วิเคราะห์จุดเด่น-ด้อยของตนเองและผู้อื่น พร้อมให้คำแนะนำพัฒนา'},
+     {id:'c4l2i2',n:'การใช้นวัตกรรม',d:'นำแนวคิดใหม่/เครื่องมือดิจิทัลมาปรับปรุงงาน สนับสนุนทีมกล้าคิดสร้างสรรค์'},
+     {id:'c4l2i3',n:'ความรวดเร็วในการตอบสนอง',d:'ตอบสนองต่อสถานการณ์ฉุกเฉินหรือการเปลี่ยนแปลงต่างๆ ได้ฉับไว'},
+     {id:'c4l2i4',n:'การวิเคราะห์ความเสี่ยง',d:'คาดการณ์แนวโน้ม วิเคราะห์ปัจจัยเสี่ยงทั้งทางตรงและทางอ้อม'},
+     {id:'c4l2i5',n:'ความมุ่งมั่น',d:'รักษาระดับความพยายาม แม้ต้องเผชิญกับความผิดพลาด โดยใช้หลักการและเหตุผล'},
+   ],
+   lv3:[
+     {id:'c4l3i1',n:'การแสวงหาโอกาส',d:'สนับสนุนให้ผู้อื่นมองเห็นศักยภาพตนเอง แสวงหาโอกาสพัฒนาตนเองและหน่วยงาน'},
+     {id:'c4l3i2',n:'การสร้างบรรยากาศเปิดกว้าง',d:'สร้างวัฒนธรรมทำงานที่เปิดกว้าง ยืดหยุ่น คล่องตัว ตอบสนองทันเวลา'},
+     {id:'c4l3i3',n:'การลดความเสี่ยงเชิงระบบ',d:'คาดการณ์ความเสี่ยงระยะยาว วางแผนลดผลกระทบที่มีต่อองค์กร'},
+     {id:'c4l3i4',n:'การเป็นต้นแบบความยืดหยุ่น',d:'ให้คำปรึกษาอย่างสุขุม แสดงความมุ่งมั่นแม้โครงการประสบความล้มเหลว'},
+     {id:'c4l3i5',n:'การถ่ายทอดและต่อยอดนวัตกรรม',d:'ถ่ายทอดองค์ความรู้/ผลงานนวัตกรรมขยายผลสู่ระดับองค์กร'},
+   ]},
+];
+
+let curStep=0, maxLv=1;
+const TH={1:5,2:4,3:4};
+const gv=id=>document.getElementById(id)?.value||'';
+const gc=id=>document.getElementById(id)?.checked||false;
+const getScore=(cid,lv)=>COMPS.find(c=>c.id===cid)[`lv${lv}`].filter(it=>gc(it.id)).length;
+const lvPassed=(cid,lv)=>getScore(cid,lv)>=TH[lv];
+const allLv1Pass=()=>COMPS.every(c=>lvPassed(c.id,1));
+const allLv2Pass=()=>COMPS.every(c=>lvPassed(c.id,2));
+
+// คำนวณระดับจากอายุงาน
+function getLevelFromExp(exp){
+  var e=parseFloat(exp)||0;
+  if(e<3) return 1;
+  if(e<=5) return 2;
+  return 3;
+}
+
+function updateProg(){
+  const pct=[0,40,90][curStep];
+  const txts=['กรอกข้อมูลส่วนตัวก่อนเริ่มประเมิน','ประเมินตัวชี้วัดแต่ละสมรรถนะ','สรุปผลการประเมิน'];
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-txt').textContent=txts[curStep];
+  ['sb0','sb1','sb2'].forEach((id,i)=>{
+    document.getElementById(id).classList.toggle('active',i===curStep);
+    document.getElementById(id).classList.toggle('done',i<curStep);
+  });
+}
+
+function goStep(n){
+  curStep=n;
+  ['p0','p1','p2'].forEach((id,i)=>document.getElementById(id).style.display=i===n?'':'none');
+  updateProg();
+  if(n===1) renderAssess();
+  if(n===2) renderSum();
+  window.scrollTo(0,0);
+}
+
+function next(from){
+  if(from===0){
+    const req=['fi','fp','ff','fl','fd','fe','fs'];
+    for(const id of req){
+      if(!gv(id)){
+        alert('กรุณากรอกข้อมูลให้ครบทุกช่องที่มี *');
+        document.getElementById(id).focus();
+        return;
+      }
+    }
+    maxLv=getLevelFromExp(gv('fe'));
+  }
+  goStep(from+1);
+}
+
+function renderAssess(){
+  const lv=maxLv;
+  let html='';
+  COMPS.forEach(comp=>{
+    html+=`<div class="card" style="margin-bottom:10px">
+      <div class="comp-hdr">
+        <div class="comp-dot" style="background:${comp.dot}"></div>
+        <div><div class="comp-name">${comp.name}</div>
+        <div style="font-size:11px;color:#9CA3AF">${comp.en}</div></div>
+      </div>`;
+    for(let l=1;l<=3;l++){
+      const inScope=l<=lv;
+      const canUnlock=l===1||(l===2&&allLv1Pass())||(l===3&&allLv2Pass());
+      const unlocked=inScope&&canUnlock;
+      if(!inScope){
+        html+=`<div class="lv-block"><div class="lv-locked">— ระดับ ${l} ไม่อยู่ในขอบเขตการประเมินของท่าน</div></div>`;
+      } else if(!unlocked){
+        const msg=l===2?'🔒 ระดับ 2 จะปลดล็อกเมื่อผ่านระดับ 1 ครบ 5/5 ทั้ง 4 สมรรถนะ':'🔒 ระดับ 3 จะปลดล็อกเมื่อผ่านระดับ 2 ≥ 4/5 ทั้ง 4 สมรรถนะ';
+        html+=`<div class="lv-block" id="lb-${comp.id}-${l}"><div class="lv-locked">${msg}</div></div>`;
+      } else {
+        const sc=getScore(comp.id,l),th=TH[l],pass=sc>=th;
+        const pcls=sc===0?'pl':(pass?'pp':'pf');
+        const ptxt=sc===0?`0/${th}`:`${sc}/${th} ${pass?'✓':'✗'}`;
+        html+=`<div class="lv-block" id="lb-${comp.id}-${l}">
+          <div class="lv-bar">
+            <div class="lv-label"><span class="badge b${l}">ระดับ ${l}</span>
+            <span style="font-size:11px;color:#9CA3AF">เกณฑ์ผ่าน ${th}/5</span></div>
+            <span class="pill ${pcls}">${ptxt}</span>
+          </div>`;
+        comp[`lv${l}`].forEach(it=>{
+          html+=`<div class="ind-row" id="row-${it.id}">
+            <input type="checkbox" class="chk" id="${it.id}" onchange="onTick('${comp.id}',${l})">
+            <div><div class="ind-name">${it.n}</div><div class="ind-desc">${it.d}</div></div>
+          </div>`;
+        });
+        html+=`</div>`;
+      }
+    }
+    html+=`<div class="score-row">
+      <span class="score-lbl">รวม</span>
+      <div class="pills" id="pills-${comp.id}"></div>
+    </div>
+    <div class="banner" id="ban-${comp.id}"></div>
+    </div>`;
+  });
+  document.getElementById('comp-wrap').innerHTML=html;
+  COMPS.forEach(c=>refreshPills(c.id));
+}
+
+function onTick(cid,lv){
+  COMPS.forEach(c=>refreshPills(c.id));
+  if(lv===1&&allLv1Pass()&&maxLv>=2) renderAssess();
+  if(lv===2&&allLv2Pass()&&maxLv>=3) renderAssess();
+}
+
+function refreshPills(cid){
+  const lv=maxLv;
+  let pills='';
+  for(let l=1;l<=lv;l++){
+    const sc=getScore(cid,l),th=TH[l],pass=sc>=th;
+    const cls=sc===0?'pl':(pass?'pp':'pf');
+    pills+=`<span class="pill ${cls}">ระดับ ${l}: ${sc}/${th}${sc>0?(pass?' ✓':' ✗'):''}</span>`;
+  }
+  const el=document.getElementById('pills-'+cid);
+  if(el) el.innerHTML=pills;
+  const ban=document.getElementById('ban-'+cid);
+  if(ban&&lv>=2){
+    const lv1ok=lvPassed(cid,1),sc=getScore(cid,1);
+    if(lv1ok){ban.className='banner bok';ban.innerHTML='✅ ระดับ 1 ผ่านแล้ว';ban.style.display='flex';}
+    else if(sc>0){ban.className='banner bno';ban.innerHTML=`⚠️ ระดับ 1 ยังไม่ผ่าน (${sc}/5) — ต้องครบ 5/5`;ban.style.display='flex';}
+    else ban.style.display='none';
+  }
+}
+
+function renderSum(){
+  const lv=maxLv;
+  let allPass=true;
+  let html=`<div class="card card-pad" style="margin-bottom:10px">
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">สรุปผลการประเมินสมรรถนะหลัก</div>
+    <div class="sum-box">
+      <div class="sum-row"><span>ชื่อ-นามสกุล</span><span style="font-weight:600">${gv('fp')}${gv('ff')} ${gv('fl')}</span></div>
+      <div class="sum-row"><span>หน่วยงาน</span><span>${gv('fd')}</span></div>
+      <div class="sum-row"><span>อายุงาน</span><span>${gv('fe')} ปี</span></div>
+      <div class="sum-row"><span>ระดับที่ประเมิน</span><span>1–${lv}</span></div>
+      <div class="sum-row"><span>ผู้บังคับบัญชา</span><span>${gv('fs')}</span></div>
+    </div>`;
+  COMPS.forEach(comp=>{
+    let compPass=true,rows='';
+    for(let l=1;l<=lv;l++){
+      const sc=getScore(comp.id,l),th=TH[l],pass=sc>=th;
+      if(!pass) compPass=false;
+      rows+=`<div class="sum-row">
+        <span style="padding-left:8px"><span class="badge b${l}" style="margin-right:4px">ระดับ ${l}</span></span>
+        <span class="${pass?'tpass':'tfail'}">${sc}/${th} ${pass?'ผ่าน':'ไม่ผ่าน'}</span>
+      </div>`;
+    }
+    if(!compPass) allPass=false;
+    html+=`<div style="margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:#6B7280;padding:4px 0">${comp.name}</div>
+      <div class="sum-box" style="padding:8px 12px">${rows}</div>
+    </div>`;
+  });
+  const cls=allPass?'res-ok':'res-no';
+  const title=allPass?'✅ ผ่านการประเมินทุกสมรรถนะ':'⚠️ มีสมรรถนะที่ต้องพัฒนาเพิ่มเติม';
+  const sub=allPass?'สมรรถนะหลักอยู่ในเกณฑ์ที่กำหนดทุกด้าน':'กรุณาดูรายละเอียดข้างต้นเพื่อวางแผนพัฒนาบุคลากร';
+  html+=`<div class="res-box ${cls}">
+    <div style="font-size:14px;font-weight:600">${title}</div>
+    <div style="font-size:12px;margin-top:4px">${sub}</div>
+  </div></div>`;
+  document.getElementById('sum-wrap').innerHTML=html;
+}
+
+async function submitData(){
+  const btn=document.getElementById('btn-submit');
+  btn.disabled=true;
+  document.getElementById('overlay').classList.add('show');
+  const lv=maxLv;
+  const payload={
+    timestamp: new Date().toISOString(),
+    empId: gv('fi'), prefix: gv('fp'),
+    fname: gv('ff'), lname: gv('fl'),
+    dept: gv('fd'), exp: gv('fe'),
+    level: lv, supervisor: gv('fs'),
+    scores: {}
+  };
+  COMPS.forEach(comp=>{
+    payload.scores[comp.id]={};
+    for(let l=1;l<=3;l++){
+      payload.scores[comp.id][`lv${l}`]=comp[`lv${l}`].map(it=>gc(it.id)?1:0);
+    }
+  });
+  try {
+    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),mode:'no-cors'});
+    document.getElementById('overlay').classList.remove('show');
+    document.getElementById('success-overlay').classList.add('show');
+  } catch(err) {
+    document.getElementById('overlay').classList.remove('show');
+    alert('เกิดข้อผิดพลาด: '+err.message);
+  }
+  btn.disabled=false;
+}
+
+function resetForm(){
+  document.getElementById('success-overlay').classList.remove('show');
+  goStep(0);
+  document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+}
+
+updateProg();
+</script>
+</body>
+</html>
