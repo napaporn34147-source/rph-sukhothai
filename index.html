@@ -429,8 +429,56 @@ function next(from){
       }
     }
     maxLv=getLevelFromExp(gv('fe'));
+    // แสดง popup ระดับก่อนไปประเมิน
+    showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
+    return;
   }
   goStep(from+1);
+}
+
+function showLevelPopup(lv, exp, onConfirm){
+  const lvText = lv===1
+    ? 'ระดับ 1 (อายุงานน้อยกว่า 3 ปี)'
+    : lv===2
+    ? 'ระดับ 1–2 (อายุงาน 3–5 ปี)'
+    : 'ระดับ 1–3 (อายุงานมากกว่า 5 ปี)';
+  const lvDesc = lv===1
+    ? 'ท่านต้องประเมินสมรรถนะ <strong>ระดับ 1</strong> เกณฑ์ผ่าน <strong>5/5</strong> ทุกสมรรถนะ'
+    : lv===2
+    ? 'ท่านต้องประเมิน <strong>ระดับ 1 และ 2</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2 ผ่านเมื่อได้ <strong>4/5</strong>'
+    : 'ท่านต้องประเมิน <strong>ระดับ 1, 2 และ 3</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2–3 ผ่านเมื่อได้ <strong>4/5</strong>';
+  const lvColor = lv===1?'#1E3A8A':lv===2?'#065F46':'#4C1D95';
+  const lvBg    = lv===1?'#EFF6FF':lv===2?'#E1F5EE':'#F5F3FF';
+
+  // สร้าง modal
+  let modal = document.getElementById('level-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'level-modal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;font-family:Sarabun,sans-serif';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:380px;width:92%;text-align:center">
+        <div id="lv-icon" style="font-size:40px;margin-bottom:10px">📋</div>
+        <div id="lv-badge" style="display:inline-block;padding:4px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:12px"></div>
+        <div id="lv-title" style="font-size:17px;font-weight:600;color:#111827;margin-bottom:8px"></div>
+        <div id="lv-exp" style="font-size:13px;color:#6B7280;margin-bottom:10px"></div>
+        <div id="lv-desc" style="font-size:13px;color:#374151;line-height:1.7;background:#F9FAFB;border-radius:8px;padding:10px 14px;margin-bottom:20px;text-align:left"></div>
+        <button id="lv-confirm" style="width:100%;padding:12px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:Sarabun,sans-serif">เริ่มประเมิน →</button>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  document.getElementById('lv-badge').textContent = lvText;
+  document.getElementById('lv-badge').style.background = lvBg;
+  document.getElementById('lv-badge').style.color = lvColor;
+  document.getElementById('lv-title').textContent = 'ระดับการประเมินของท่าน';
+  document.getElementById('lv-exp').textContent = 'อายุงาน ' + exp + ' ปี';
+  document.getElementById('lv-desc').innerHTML = lvDesc;
+  document.getElementById('lv-confirm').onclick = function(){
+    modal.style.display = 'none';
+    onConfirm();
+  };
+  modal.style.display = 'flex';
 }
 
 function renderAssess(){
