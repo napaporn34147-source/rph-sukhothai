@@ -71,6 +71,9 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
 .btn-pri:disabled{background:#9CA3AF;cursor:not-allowed}
 .btn-sec{padding:13px 20px;background:#F3F4F6;color:#6B7280;border:1.5px solid #D1D5DB;border-radius:8px;font-size:16px;cursor:pointer;font-family:'Sarabun',sans-serif}
 .note{font-size:14px;color:#9CA3AF}
+.field input.error{border-color:#EF4444!important;background:#FEF2F2!important}
+.err-msg{font-size:12px;color:#DC2626;margin-top:3px;display:none}
+.err-msg.show{display:block}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;align-items:center;justify-content:center}
 .overlay.show{display:flex}
 .modal{background:#fff;border-radius:14px;padding:28px 32px;max-width:380px;width:90%;text-align:center}
@@ -106,139 +109,156 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
   <div class="card card-pad">
     <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:10px">ข้อมูลบุคลากร</div>
     <div class="fgrid">
-      <div class="field"><label>รหัสบุคลากร *</label><input id="fi" placeholder="เช่น 10234"></div>
+      <div class="field">
+        <label>รหัสบุคลากร (รหัสแสกนลายนิ้วมือ) *</label>
+        <input id="fi" type="text" inputmode="numeric" maxlength="5" placeholder="ตัวเลข 5 หลัก" oninput="validateEmpId(this)">
+        <span class="err-msg" id="fi-err">รหัสต้องเป็นตัวเลข 5 หลักเท่านั้น</span>
+      </div>
       <div class="field"><label>คำนำหน้า *</label>
         <select id="fp"><option value="">เลือก</option><option>นาย</option><option>นาง</option><option>นางสาว</option></select></div>
       <div class="field"><label>ชื่อ *</label><input id="ff" placeholder="ชื่อจริง"></div>
       <div class="field"><label>นามสกุล *</label><input id="fl" placeholder="นามสกุล"></div>
-      <div class="field full"><label>หน่วยงาน *</label>
+      <div class="field full"><label>กลุ่มงาน *</label>
         <select id="fd">
-          <option value="">— เลือกหน่วยงานหรือกลุ่มงาน —</option>
-          <option>องค์กรแพทย์</option><option>OPD งานกระตุ้นพัฒนาการเด็ก</option>
-          <option>OPD จิตเวช</option><option>OPD บริการปรึกษาสุขภาพ</option>
-          <option>OPD ผู้ป่วยนอก</option><option>OPD คลินิกฝากครรภ์</option>
-          <option>OPD จักษุ</option><option>OPD โสต ศอ นาสิก</option>
-          <option>กลุ่มงานกายภาพบำบัด</option><option>กลุ่มงานการเงิน</option>
-          <option>กลุ่มงานการแพทย์แผนไทยและแพทย์ทางเลือก</option>
+          <option value="">— เลือกกลุ่มงาน —</option>
+          <option>กลุ่มงานบริหารทั่วไป</option>
           <option>กลุ่มงานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์</option>
-          <option>กลุ่มงานจิตเวชและยาเสพติด</option><option>กลุ่มงานทรัพยากรบุคคล</option>
-          <option>กลุ่มงานทันตกรรม</option><option>กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก</option>
-          <option>กลุ่มงานบริหารทั่วไป</option><option>กลุ่มงานบัญชี</option>
-          <option>กลุ่มงานประกันสุขภาพ</option><option>กลุ่มงานพยาธิวิทยากายวิภาค</option>
+          <option>กลุ่มงานทรัพยากรบุคคล</option>
+          <option>กลุ่มงานพัสดุ</option>
+          <option>กลุ่มงานการเงิน</option>
+          <option>กลุ่มงานบัญชี</option>
+          <option>กลุ่มงานเวชกรรมสังคม</option>
+          <option>กลุ่มงานอาชีวเวชกรรม</option>
+          <option>กลุ่มงานการแพทย์แผนไทยและแพทย์ทางเลือก</option>
+          <option>กลุ่มงานสุขศึกษา</option>
+          <option>กลุ่มงานการพยาบาลชุมชน</option>
+          <option>กลุ่มงานการพยาบาลวิสัญญี</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยห้องผ่าตัด</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยสูติ-นรีเวช</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยอุบัติเหตุและฉุกเฉิน</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยออร์โธปิดิกส์</option>
+          <option>กลุ่มงานการพยาบาลด้านการควบคุมและป้องกันการติดเชื้อ</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยศัลยกรรม</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยหนัก</option>
+          <option>กลุ่มงานการพยาบาลตรวจรักษาพิเศษ</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยอายุรกรรม</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยนอก</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วย โสต ศอ นาสิก จักษุ</option>
+          <option>กลุ่มงานการพยาบาลผู้ป่วยกุมารเวชกรรม</option>
+          <option>กลุ่มงานการพยาบาลผู้คลอด</option>
+          <option>กลุ่มงานการพยาบาลจิตเวช</option>
+          <option>กลุ่มงานวิจัยและพัฒนาการพยาบาล</option>
+          <option>กลุ่มงานกายภาพบำบัด</option>
+          <option>กลุ่มงานเวชศาสตร์ฉุกเฉิน</option>
+          <option>กลุ่มงานอายุรกรรม</option>
+          <option>กลุ่มงานศัลยกรรม</option>
+          <option>กลุ่มงานศัลยกรรมออร์โธปิดิกส์</option>
+          <option>กลุ่มงานกุมารเวชกรรม</option>
+          <option>กลุ่มงานจักษุวิทยา</option>
+          <option>กลุ่มงานโสต ศอ นาสิก</option>
+          <option>กลุ่มงานโภชนศาสตร์</option>
+          <option>กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก</option>
+          <option>กลุ่มงานพยาธิวิทยากายวิภาค</option>
+          <option>กลุ่มงานสูติ-นรีเวชกรรม</option>
+          <option>กลุ่มงานวิสัญญีวิทยา</option>
+          <option>กลุ่มงานรังสีวิทยา</option>
+          <option>กลุ่มงานบริการทันตกรรมตติยภูมิและศูนย์ความเป็นเลิศ</option>
+          <option>กลุ่มงานจิตเวชและยาเสพติด</option>
+          <option>กลุ่มงานเวชกรรมฟื้นฟู</option>
+          <option>กลุ่มงานเภสัชกรรม</option>
+          <option>กลุ่มงานสังคมสงเคราะห์</option>
+          <option>กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์</option>
+          <option>กลุ่มงานประกันสุขภาพ</option>
+          <option>กลุ่มงานยุทธศาสตร์และแผนงานโครงการ</option>
+          <option>กลุ่มงานพัฒนาทรัพยากรบุคคล</option>
           <option>กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน</option>
-          <option>กลุ่มงานพัฒนาทรัพยากรบุคคล</option><option>กลุ่มงานพัสดุ</option>
-          <option>กลุ่มงานโภชนศาสตร์</option><option>กลุ่มงานยุทธศาสตร์และแผนงานโครงการ</option>
-          <option>กลุ่มงานรังสีวิทยา</option><option>กลุ่มงานเวชกรรมฟื้นฟู</option>
-          <option>กลุ่มงานเวชกรรมสังคม</option><option>กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์</option>
-          <option>กลุ่มงานสังคมสงเคราะห์</option><option>กลุ่มงานสุขศึกษา</option>
-          <option>กลุ่มงานอาชีวเวชกรรม</option><option>งานจ่ายกลาง</option>
-          <option>งานเปล</option><option>งานวิสัญญีพยาบาล</option>
-          <option>งานห้องคลอด</option><option>งานห้องผ่าตัด</option>
-          <option>งานอุบัติเหตุและฉุกเฉิน</option><option>ไตเทียม</option>
-          <option>เภสัชกรรม IPD</option><option>เภสัชกรรม OPD</option>
-          <option>เภสัชกรรมสารสนเทศ</option><option>เภสัชกรรมห้องคลัง</option>
-          <option>เภสัชกรรมห้องผลิต</option><option>ศูนย์เครื่องมือแพทย์</option>
-          <option>ศูนย์พนักงานทำความสะอาด</option><option>สำนักงานการพยาบาล</option>
-          <option>หอผู้ป่วยกุมารเวชกรรมชั้น 3</option><option>หอผู้ป่วยกุมารเวชกรรมชั้น 4</option>
-          <option>หอผู้ป่วยจักษุ</option><option>หอผู้ป่วยจิตเวชและยาเสพติด</option>
-          <option>หอผู้ป่วยพิเศษจิตเมตตาชั้น 5-6</option>
-          <option>หอผู้ป่วยพิเศษประชาร่วมใจชั้น 5</option>
-          <option>หอผู้ป่วยพิเศษประชาร่วมใจชั้น 6</option>
-          <option>หอผู้ป่วยศัลยกรรมกระดูก</option><option>หอผู้ป่วยศัลยกรรมชาย</option>
-          <option>หอผู้ป่วยศัลยกรรมหญิง</option><option>หอผู้ป่วยสูติ-นรีเวชกรรม</option>
-          <option>หอผู้ป่วยอายุรกรรมชาย</option><option>หอผู้ป่วยอายุรกรรมหญิง</option>
-          <option>หออภิบาลผู้ป่วยวิกฤตโรคหลอดเลือดสมอง</option>
-          <option>หออภิบาลผู้ป่วยวิกฤตศัลยกรรม</option>
-          <option>หออภิบาลผู้ป่วยวิกฤตอายุรกรรม</option>
-          <option>IC/TB clinic</option>
-          <option>เทคโนโลยีสารสนเทศ</option>
-          <option>สุขภาพดิจิทัล</option>
+          <option>กลุ่มงานผู้ป่วยนอก (ปฐมภูมิ)</option>
+          <option>สำนักงานกลุ่มการพยาบาล</option>
+          <option>กลุ่มงานนิติเวช</option>
+          <option>กลุ่มงานเทคโนโลยีสารสนเทศ</option>
+          <option>กลุ่มงานสุขภาพดิจิทัล</option>
+          <option>กลุ่มงานบริการทันตกรรมปฐมภูมิและทุติยภูมิ</option>
+          <option>กลุ่มงานพัฒนาคุณภาพบริการและวิชาการทันตกรรม</option>
         </select></div>
       <div class="field"><label>อายุงาน (ปี) *</label>
         <input id="fe" type="number" min="0" max="50" step="0.5" placeholder="เช่น 3.5"></div>
-      <div class="field full"><label>ผู้บังคับบัญชา *</label>
+      <div class="field full"><label>หัวหน้า *</label>
         <select id="fs">
-          <option value="">— เลือกผู้บังคับบัญชา —</option>
-                    <optgroup label="กลุ่มภารกิจ">
-            <option>นางกนกพจน์ มีวัฒนา</option>
-            <option>นายปรีชา ภิญโญพรพาณิชย์</option>
-            <option>นางรตินันทน์ เตชะสืบ</option>
-            <option>นายพงศ์กฤช เนียมหุ่น</option>
-            <option>นางรุ่งทิพย์ พงศ์กิจการเจริญ</option>
-            <option>นายครรชิต สุวรรณาลัย</option>
-            <option>นายเสถียรพงศ์ ตรีกุย</option>
-          </optgroup>
-          <optgroup label="หัวหน้ากลุ่มงาน">
-            <option>นางศุภานัน ปานประภากร</option>
-            <option>นายวสุธนวรรธน์ เอี่ยมประพันธ์</option>
-            <option>นางสาวศิริวรรณ คะเนนอก</option>
-            <option>นางวรางคณา วสุรัตน์</option>
-            <option>นางสาวชนม์พรรษ์ ลิปิกรโกศล</option>
-            <option>นางกัญญา คงเจริญ</option>
-            <option>นางสาวมาลี ด้วงพรม</option>
-            <option>นางสาวณัฐยาภรณ์ ทรงธรรม</option>
-            <option>นางศุภพร ไพรอุดม</option>
-            <option>นางพัชรี ชัยวัฒนกุล</option>
-            <option>นางภัทราวรรณ ศิรินันทยา</option>
-            <option>นางทัศนีย์ แสงเงิน</option>
-            <option>นางสาวฐิติมา ขอบเขตต์</option>
-            <option>นางสาวทิพารัตน์ หมื่นมะโน</option>
-            <option>นางอภัณตรี อินสอน</option>
-            <option>นางชูจิตร วงศ์คำ</option>
-            <option>นางมยุรี มะโนวรรณ์</option>
-            <option>นางสาวอำพัน วินิยม</option>
-            <option>นางนุจรี นิช่างทอง</option>
-            <option>นางเพ็ญพรรณ วัฒนา</option>
-            <option>นางสาวกาญจนา พยัคฆ์</option>
-            <option>นางสาวอานุภาพ กันทะวงค์</option>
-            <option>นางพรรณราย สายเนตร</option>
-            <option>นางสาวพัชรี กระชั้น</option>
-            <option>นางสถาพร จูทอง</option>
-            <option>นางดิฐี ไชยเพชร</option>
-            <option>นายธเนศ แตกฉาน</option>
-            <option>นางวารุณีย์ อภิวงศ์สุวรรณ</option>
-            <option>นางสาวสโรบล อยู่สำราญ</option>
-            <option>นางสาวสุนทรีย์ ลื้อยอด</option>
-            <option>นายสมชาย เขียวริด</option>
-            <option>นายฉลอง จันทร์พะโยม</option>
-            <option>นางณัฐพร เนียมหุ่น</option>
-            <option>นายณัฐวุฒิ สินสุวรรณ</option>
-            <option>นายสุเปรม หนูเมือง</option>
-            <option>นางสาววราพรรณ บุญคง</option>
-            <option>นางอรอุมา นันทา</option>
-            <option>นายจารุบุตร พิสุทธิ์รัตนาภรณ์</option>
-            <option>นายรุ่ง ทานะมัย</option>
-            <option>นางศิริรัตน์ ศิรินวล</option>
-            <option>นางสาวสุมาลี กุละพัฒน์</option>
-            <option>นายจิณณะ ศรีแจ่มดี</option>
-            <option>นางสาวอุไร ชาญตระกูล</option>
-            <option>นางทิพสุดา อู่วุฒิพงษ์</option>
-            <option>นางพรรณวิภา แจ่มทุ่ง</option>
-            <option>นางวิมล อินสวน</option>
-            <option>นางสาวประไพรัตน์ เหมราช</option>
-            <option>นางสาวสุทัชชา ฉัตรไชยาฤกษ์</option>
-            <option>นางมีนา นาคร</option>
-            <option>นายสุพัฒน์ ปัญญานุกุล</option>
-            <option>นายพิเศษ อินสวน</option>
-            <option>นายสาธิต พรพัฒนารักษ์</option>
-            <option>นางพรรณนิภา ช่วยเพ็ญ</option>
-            <option>นายเกริกชัย บูชาเกียรติ</option>
-            <option>นางณินญาภร ใจยอด</option>
-            <option>นายกวิน ก้านแก้ว</option>
-            <option>นายเชิดศักดิ์ ศักดิ์ลอ</option>
-            <option>นายบัณฑิต ฉิมอำพันธ์</option>
-          </optgroup>
-          <optgroup label="หัวหน้าหอ/งาน">
-            <option>นางนวลพรรณ จิ๋วปัญญา</option>
-            <option>นางสาววรรณริชฎา กิตติธงโสภณ</option>
-            <option>นางเกษนภา กิ่งก้าน</option>
-            <option>นางสุณัฏฐา อิ่มเอม</option>
-            <option>นางวันทนีย์ พีธรากร</option>
-            <option>นางกัลยาณี ตรีธรรมพินิจ</option>
-            <option>นายบุญช่วย เรืองคำ</option>
-            <option>นางสาวศิริลักษณ์ อุปวาณิช</option>
-            <option>นางภาวีนัส คำพวง</option>
-          </optgroup>
+          <option value="">— เลือกหัวหน้า(หัวหน้า 1 ระดับ) —</option>
+          <option>นางกนกพจน์ มีวัฒนา</option>
+          <option>นายปรีชา ภิญโญพรพาณิชย์</option>
+          <option>นางรตินันทน์ เตชะสืบ</option>
+          <option>นายพงศ์กฤช เนียมหุ่น</option>
+          <option>นางรุ่งทิพย์ พงศ์กิจการเจริญ</option>
+          <option>นายครรชิต สุวรรณาลัย</option>
+          <option>นายเสถียรพงศ์ ตรีกุย</option>
+          <option>นางศุภานัน ปานประภากร</option>
+          <option>นายวสุธนวรรธน์ เอี่ยมประพันธ์</option>
+          <option>นางสาวศิริวรรณ คะเนนอก</option>
+          <option>นางวรางคณา วสุรัตน์</option>
+          <option>นางสาวชนม์พรรษ์ ลิปิกรโกศล</option>
+          <option>นางกัญญา คงเจริญ</option>
+          <option>นางสาวมาลี ด้วงพรม</option>
+          <option>นางสาวณัฐยาภรณ์ ทรงธรรม</option>
+          <option>นางศุภพร ไพรอุดม</option>
+          <option>นางพัชรี ชัยวัฒนกุล</option>
+          <option>นางภัทราวรรณ ศิรินันทยา</option>
+          <option>นางทัศนีย์ แสงเงิน</option>
+          <option>นางสาวฐิติมา ขอบเขตต์</option>
+          <option>นางสาวทิพารัตน์ หมื่นมะโน</option>
+          <option>นางอภัณตรี อินสอน</option>
+          <option>นางชูจิตร วงศ์คำ</option>
+          <option>นางมยุรี มะโนวรรณ์</option>
+          <option>นางสาวอำพัน วินิยม</option>
+          <option>นางนุจรี นิช่างทอง</option>
+          <option>นางเพ็ญพรรณ วัฒนา</option>
+          <option>นางสาวกาญจนา พยัคฆ์</option>
+          <option>นางสาวอานุภาพ กันทะวงค์</option>
+          <option>นางพรรณราย สายเนตร</option>
+          <option>นางสาวพัชรี กระชั้น</option>
+          <option>นางสถาพร จูทอง</option>
+          <option>นางดิฐี ไชยเพชร</option>
+          <option>นายธเนศ แตกฉาน</option>
+          <option>นางวารุณีย์ อภิวงศ์สุวรรณ</option>
+          <option>นางสาวสโรบล อยู่สำราญ</option>
+          <option>นางสาวสุนทรีย์ ลื้อยอด</option>
+          <option>นายสมชาย เขียวริด</option>
+          <option>นายฉลอง จันทร์พะโยม</option>
+          <option>นางณัฐพร เนียมหุ่น</option>
+          <option>นายณัฐวุฒิ สินสุวรรณ</option>
+          <option>นายสุเปรม หนูเมือง</option>
+          <option>นางสาววราพรรณ บุญคง</option>
+          <option>นางอรอุมา นันทา</option>
+          <option>นายจารุบุตร พิสุทธิ์รัตนาภรณ์</option>
+          <option>นายรุ่ง ทานะมัย</option>
+          <option>นางศิริรัตน์ ศิรินวล</option>
+          <option>นางสาวสุมาลี กุละพัฒน์</option>
+          <option>นายจิณณะ ศรีแจ่มดี</option>
+          <option>นางสาวอุไร ชาญตระกูล</option>
+          <option>นางทิพสุดา อู่วุฒิพงษ์</option>
+          <option>นางพรรณวิภา แจ่มทุ่ง</option>
+          <option>นางวิมล อินสวน</option>
+          <option>นางสาวประไพรัตน์ เหมราช</option>
+          <option>นางสาวสุทัชชา ฉัตรไชยาฤกษ์</option>
+          <option>นางมีนา นาคร</option>
+          <option>นายสุพัฒน์ ปัญญานุกุล</option>
+          <option>นายพิเศษ อินสวน</option>
+          <option>นายสาธิต พรพัฒนารักษ์</option>
+          <option>นางพรรณนิภา ช่วยเพ็ญ</option>
+          <option>นายเกริกชัย บูชาเกียรติ</option>
+          <option>นางณินญาภร ใจยอด</option>
+          <option>นายกวิน ก้านแก้ว</option>
+          <option>นายเชิดศักดิ์ ศักดิ์ลอ</option>
+          <option>นายบัณฑิต ฉิมอำพันธ์</option>
+          <option>นางนวลพรรณ จิ๋วปัญญา</option>
+          <option>นางสาววรรณริชฎา กิตติธงโสภณ</option>
+          <option>นางเกษนภา กิ่งก้าน</option>
+          <option>นางสุณัฏฐา อิ่มเอม</option>
+          <option>นางวันทนีย์ พีธรากร</option>
+          <option>นางกัลยาณี ตรีธรรมพินิจ</option>
+          <option>นายบุญช่วย เรืองคำ</option>
+          <option>นางสาวศิริลักษณ์ อุปวาณิช</option>
+          <option>นางภาวีนัส คำพวง</option>
         </select></div>
     </div>
   </div>
@@ -262,7 +282,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
   <div id="sum-wrap"></div>
   <div class="action-bar">
     <button class="btn-sec" onclick="goStep(1)">← ย้อนกลับ</button>
-    <button class="btn-pri" id="btn-submit" onclick="submitData()">✓ บันทึกส่งผู้บังคับบัญชา</button>
+    <button class="btn-pri" id="btn-submit" onclick="submitData()">✓ บันทึกส่งหัวหน้า</button>
   </div>
 </div>
 
@@ -280,7 +300,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
   <div class="modal">
     <div style="font-size:48px;margin-bottom:12px">✅</div>
     <h2>ส่งแบบประเมินสำเร็จ!</h2>
-    <p>ผู้บังคับบัญชาจะได้รับทราบผลการประเมินของท่านผ่านระบบ</p>
+    <p>หัวหน้าจะได้รับทราบผลการประเมินของท่านผ่านระบบ</p>
     <button class="btn-pri" onclick="resetForm()" style="width:100%;margin-top:4px">ปิด</button>
   </div>
 </div>
@@ -420,6 +440,13 @@ function goStep(n){
   window.scrollTo(0,0);
 }
 
+function validateEmpId(el){
+  el.value = el.value.replace(/[^0-9]/g,'');
+  const ok = /^\d{5}$/.test(el.value);
+  el.classList.toggle('error', el.value.length > 0 && !ok);
+  document.getElementById('fi-err').classList.toggle('show', el.value.length > 0 && !ok);
+}
+
 function next(from){
   if(from===0){
     const req=['fi','fp','ff','fl','fd','fe','fs'];
@@ -429,6 +456,14 @@ function next(from){
         document.getElementById(id).focus();
         return;
       }
+    }
+    const empId = gv('fi');
+    if(!/^\d{5}$/.test(empId)){
+      const el = document.getElementById('fi');
+      el.classList.add('error');
+      document.getElementById('fi-err').classList.add('show');
+      el.focus();
+      return;
     }
     maxLv=getLevelFromExp(gv('fe'));
     // แสดง popup ระดับก่อนไปประเมิน
@@ -607,10 +642,10 @@ function renderSum(){
     <div style="font-size:14px;font-weight:600;margin-bottom:10px">สรุปผลการประเมินสมรรถนะหลัก</div>
     <div class="sum-box">
       <div class="sum-row"><span>ชื่อ-นามสกุล</span><span style="font-weight:600">${gv('fp')}${gv('ff')} ${gv('fl')}</span></div>
-      <div class="sum-row"><span>หน่วยงาน</span><span>${gv('fd')}</span></div>
+      <div class="sum-row"><span>กลุ่มงาน</span><span>${gv('fd')}</span></div>
       <div class="sum-row"><span>อายุงาน</span><span>${gv('fe')} ปี</span></div>
       <div class="sum-row"><span>ระดับที่ประเมิน</span><span>1–${lv}</span></div>
-      <div class="sum-row"><span>ผู้บังคับบัญชา</span><span>${gv('fs')}</span></div>
+      <div class="sum-row"><span>หัวหน้า</span><span>${gv('fs')}</span></div>
     </div>`;
   COMPS.forEach(comp=>{
     let compPass=true,rows='';
