@@ -125,15 +125,10 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
           <option value="1">2. ประเมินสมรรถนะหลักสำหรับผู้บริหาร</option>
           <option value="2">3. ประเมินสมรรถนะหลักสำหรับผู้ปฏิบัติการและผู้บริหาร</option>
         </select>
-      </div>
-      <div class="field full" id="execpos-wrap" style="display:none">
-        <label>ตำแหน่งงาน (สำหรับแบบประเมินผู้บริหาร) *</label>
-        <select id="fexecpos">
-          <option value="">— เลือกตำแหน่งงาน —</option>
-          <option value="1">1. หัวหน้างาน/รองหัวหน้า</option>
-          <option value="2">2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย</option>
-          <option value="3">3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ</option>
-        </select>
+        <div style="font-size:12px;color:#9CA3AF;margin-top:6px;line-height:1.6">
+          (แบบประเมินผู้บริหารใช้สำหรับ 1. หัวหน้างาน/รองหัวหน้า 2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย 3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ เท่านั้น)
+        </div>
+        <input type="hidden" id="fexecpos" value="">
       </div>
     </div>
   </div>
@@ -436,10 +431,7 @@ function validateEmpId(el){
   document.getElementById('fi-err').classList.toggle('show', el.value.length > 0 && !ok);
 }
 function onFormTypeChange(){
-  const ft = gv('fformtype');
-  // แสดงตำแหน่งงานในหน้าแรกเฉพาะกรณีเลือก "เฉพาะผู้บริหาร" (ft==='1')
-  // กรณี "ทั้งสองแบบ" (ft==='2') จะถามตำแหน่งงานทีหลัง หลัง submit ปฏิบัติการ
-  document.getElementById('execpos-wrap').style.display = (ft==='1') ? '' : 'none';
+  // ไม่มีช่องเลือกตำแหน่งงานในหน้านี้แล้ว — จะถามตอนเริ่มประเมินบริหารแทน
 }
 const DEPT_LIST=['กลุ่มงานบริหารทั่วไป','กลุ่มงานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์','กลุ่มงานทรัพยากรบุคคล','กลุ่มงานพัสดุ','กลุ่มงานการเงิน','กลุ่มงานบัญชี','กลุ่มงานเวชกรรมสังคม','กลุ่มงานอาชีวเวชกรรม','กลุ่มงานการแพทย์แผนไทยและแพทย์ทางเลือก','กลุ่มงานสุขศึกษา','กลุ่มงานการพยาบาลชุมชน','กลุ่มงานการพยาบาลวิสัญญี','กลุ่มงานการพยาบาลผู้ป่วยห้องผ่าตัด','กลุ่มงานการพยาบาลผู้ป่วยสูติ-นรีเวช','กลุ่มงานการพยาบาลผู้ป่วยอุบัติเหตุและฉุกเฉิน','กลุ่มงานการพยาบาลผู้ป่วยออร์โธปิดิกส์','กลุ่มงานการพยาบาลด้านการควบคุมและป้องกันการติดเชื้อ','กลุ่มงานการพยาบาลผู้ป่วยศัลยกรรม','กลุ่มงานการพยาบาลผู้ป่วยหนัก','กลุ่มงานการพยาบาลตรวจรักษาพิเศษ','กลุ่มงานการพยาบาลผู้ป่วยอายุรกรรม','กลุ่มงานการพยาบาลผู้ป่วยนอก','กลุ่มงานการพยาบาลผู้ป่วย โสต ศอ นาสิก จักษุ','กลุ่มงานการพยาบาลผู้ป่วยกุมารเวชกรรม','กลุ่มงานการพยาบาลผู้คลอด','กลุ่มงานการพยาบาลจิตเวช','กลุ่มงานวิจัยและพัฒนาการพยาบาล','กลุ่มงานกายภาพบำบัด','กลุ่มงานเวชศาสตร์ฉุกเฉิน','กลุ่มงานอายุรกรรม','กลุ่มงานศัลยกรรม','กลุ่มงานศัลยกรรมออร์โธปิดิกส์','กลุ่มงานกุมารเวชกรรม','กลุ่มงานจักษุวิทยา','กลุ่มงานโสต ศอ นาสิก','กลุ่มงานโภชนศาสตร์','กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก','กลุ่มงานพยาธิวิทยากายวิภาค','กลุ่มงานสูติ-นรีเวชกรรม','กลุ่มงานวิสัญญีวิทยา','กลุ่มงานรังสีวิทยา','กลุ่มงานบริการทันตกรรมตติยภูมิและศูนย์ความเป็นเลิศ','กลุ่มงานจิตเวชและยาเสพติด','กลุ่มงานเวชกรรมฟื้นฟู','กลุ่มงานเภสัชกรรม','กลุ่มงานสังคมสงเคราะห์','กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์','กลุ่มงานประกันสุขภาพ','กลุ่มงานยุทธศาสตร์และแผนงานโครงการ','กลุ่มงานพัฒนาทรัพยากรบุคคล','กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน','กลุ่มงานผู้ป่วยนอก (ปฐมภูมิ)','สำนักงานกลุ่มการพยาบาล','กลุ่มงานนิติเวช','กลุ่มงานเทคโนโลยีสารสนเทศ','กลุ่มงานสุขภาพดิจิทัล','กลุ่มงานบริการทันตกรรมปฐมภูมิและทุติยภูมิ','กลุ่มงานพัฒนาคุณภาพบริการและวิชาการทันตกรรม'];
 const HEAD_LIST=['นายสุนทร อินทพิบูลย์','นางกนกพจน์ มีวัฒนา','นายปรีชา ภิญโญพรพาณิชย์','นางรตินันทน์ เตชะสืบ','นายพงศ์กฤช เนียมหุ่น','นางรุ่งทิพย์ พงศ์กิจการเจริญ','นายครรชิต สุวรรณาลัย','นายเสถียรพงศ์ ตรีกุย','นางศุภานัน ปานประภากร','นายวสุธนวรรธน์ เอี่ยมประพันธ์','นางสาวศิริวรรณ คะเนนอก','นางวรางคณา วสุรัตน์','นางสาวชนม์พรรษ์ ลิปิกรโกศล','นางกัญญา คงเจริญ','นางสาวมาลี ด้วงพรม','นางสาวณัฐยาภรณ์ ทรงธรรม','นางศุภพร ไพรอุดม','นางพัชรี ชัยวัฒนกุล','นางภัทราวรรณ ศิรินันทยา','นางทัศนีย์ แสงเงิน','นางสาวฐิติมา ขอบเขตต์','นางสาวทิพารัตน์ หมื่นมะโน','นางอภัณตรี อินสอน','นางชูจิตร วงศ์คำ','นางมยุรี มะโนวรรณ์','นางสาวอำพัน วินิยม','นางนุจรี นิช่างทอง','นางเพ็ญพรรณ วัฒนา','นางสาวกาญจนา พยัคฆ์','นางสาวอานุภาพ กันทะวงค์','นางพรรณราย สายเนตร','นางสาวพัชรี กระชั้น','นางสถาพร จูทอง','นางดิฐี ไชยเพชร','นายธเนศ แตกฉาน','นางวารุณีย์ อภิวงศ์สุวรรณ','นางสาวสโรบล อยู่สำราญ','นางสาวสุนทรีย์ ลื้อยอด','นายสมชาย เขียวริด','นายฉลอง จันทร์พะโยม','นางณัฐพร เนียมหุ่น','นายณัฐวุฒิ สินสุวรรณ','นายสุเปรม หนูเมือง','นางสาววราพรรณ บุญคง','นางอรอุมา นันทา','นายจารุบุตร พิสุทธิ์รัตนาภรณ์','นายรุ่ง ทานะมัย','นางศิริรัตน์ ศิรินวล','นางสาวสุมาลี กุละพัฒน์','นายจิณณะ ศรีแจ่มดี','นางสาวอุไร ชาญตระกูล','นางทิพสุดา อู่วุฒิพงษ์','นางพรรณวิภา แจ่มทุ่ง','นางวิมล อินสวน','นางสาวประไพรัตน์ เหมราช','นางสาวสุทัชชา ฉัตรไชยาฤกษ์','นางมีนา นาคร','นายสุพัฒน์ ปัญญานุกุล','นายพิเศษ อินสวน','นายสาธิต พรพัฒนารักษ์','นางพรรณนิภา ช่วยเพ็ญ','นายเกริกชัย บูชาเกียรติ','นางณินญาภร ใจยอด','นายกวิน ก้านแก้ว','นายเชิดศักดิ์ ศักดิ์ลอ','นายบัณฑิต ฉิมอำพันธ์','นางนวลพรรณ จิ๋วปัญญา','นางสาววรรณริชฎา กิตติธงโสภณ','นางเกษนภา กิ่งก้าน','นางสุณัฏฐา อิ่มเอม','นางวันทนีย์ พีธรากร','นางกัลยาณี ตรีธรรมพินิจ','นายบุญช่วย เรืองคำ','นางสาวศิริลักษณ์ อุปวาณิช','นางภาวีนัส คำพวง'];
@@ -526,25 +518,17 @@ function next(from){
       el.focus();
       return;
     }
-    // ft==='1' (เฉพาะผู้บริหาร) ต้องเลือกตำแหน่งงานในหน้านี้ด้วย
-    if(ft==='1' && !gv('fexecpos')){
-      alert('กรุณาเลือกตำแหน่งงาน');
-      document.getElementById('fexecpos').focus();
-      return;
-    }
 
     if(ft==='0'){
-      // เฉพาะผู้ปฏิบัติการ
+      // เฉพาะผู้ปฏิบัติการ — ไม่มีตำแหน่งงาน
       PHASE='staff'; ACTIVE_COMPS=COMPS;
       maxLv=getLevelFromExp(gv('fe'));
       showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
     } else if(ft==='1'){
-      // เฉพาะผู้บริหาร
-      PHASE='exec'; ACTIVE_COMPS=EXEC_COMPS;
-      maxLv=parseInt(gv('fexecpos'))||1; EXEC_LEVEL=maxLv;
-      showExecLevelPopup(maxLv, function(){ goStep(1); });
+      // เฉพาะผู้บริหาร — ถามตำแหน่งงานก่อนเริ่มประเมิน
+      askExecPositionThenContinue(false);
     } else {
-      // ทั้งสองแบบ — เริ่มจากผู้ปฏิบัติการก่อนเสมอ
+      // ทั้งสองแบบ — เริ่มจากผู้ปฏิบัติการก่อนเสมอ (ไม่มีตำแหน่งงานในรอบนี้)
       PHASE='staff'; ACTIVE_COMPS=COMPS;
       maxLv=getLevelFromExp(gv('fe'));
       showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
@@ -816,7 +800,7 @@ async function submitData(){
     if(ft==='2' && PHASE==='staff'){
       // ส่งแบบปฏิบัติการเสร็จแล้ว ถ้าเลือก "ทั้งสองแบบ" ให้ต่อด้วยแบบบริหารทันที
       btn.disabled=false;
-      askExecPositionThenContinue();
+      askExecPositionThenContinue(true);
     } else {
       document.getElementById('success-overlay').classList.add('show');
     }
@@ -826,17 +810,22 @@ async function submitData(){
   }
   btn.disabled=false;
 }
-function askExecPositionThenContinue(){
+function askExecPositionThenContinue(afterStaffSubmit){
   let modal = document.getElementById('exec-ask-modal');
+  const icon  = afterStaffSubmit ? '✅' : '🧑‍💼';
+  const title = afterStaffSubmit ? 'บันทึกแบบปฏิบัติการสำเร็จ' : 'เริ่มแบบประเมินผู้บริหาร';
+  const sub   = afterStaffSubmit ? 'กรุณาเลือกตำแหน่งงานเพื่อประเมินต่อในส่วนผู้บริหาร' : 'กรุณาเลือกตำแหน่งงานก่อนเริ่มประเมิน';
   if(!modal){
     modal = document.createElement('div');
     modal.id = 'exec-ask-modal';
     modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;font-family:Sarabun,sans-serif';
-    modal.innerHTML = `
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
       <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:380px;width:92%;text-align:center">
-        <div style="font-size:40px;margin-bottom:10px">✅</div>
-        <div style="font-size:17px;font-weight:600;color:#111827;margin-bottom:6px">บันทึกแบบปฏิบัติการสำเร็จ</div>
-        <div style="font-size:13px;color:#6B7280;margin-bottom:18px">กรุณาเลือกตำแหน่งงานเพื่อประเมินต่อในส่วนผู้บริหาร</div>
+        <div style="font-size:40px;margin-bottom:10px">${icon}</div>
+        <div style="font-size:17px;font-weight:600;color:#111827;margin-bottom:6px">${title}</div>
+        <div style="font-size:13px;color:#6B7280;margin-bottom:18px">${sub}</div>
         <select id="exec-ask-pos" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-size:15px;font-family:Sarabun,sans-serif;margin-bottom:16px">
           <option value="">— เลือกตำแหน่งงาน —</option>
           <option value="1">1. หัวหน้างาน/รองหัวหน้า</option>
@@ -845,8 +834,6 @@ function askExecPositionThenContinue(){
         </select>
         <button id="exec-ask-confirm" style="width:100%;padding:12px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:Sarabun,sans-serif">ถัดไป →</button>
       </div>`;
-    document.body.appendChild(modal);
-  }
   document.getElementById('exec-ask-confirm').onclick = function(){
     const pos = document.getElementById('exec-ask-pos').value;
     if(!pos){ alert('กรุณาเลือกตำแหน่งงาน'); return; }
@@ -854,7 +841,6 @@ function askExecPositionThenContinue(){
     modal.style.display='none';
     PHASE='exec'; ACTIVE_COMPS=EXEC_COMPS;
     maxLv=parseInt(pos); EXEC_LEVEL=maxLv;
-    // ล้าง checkbox ของแบบปฏิบัติการก่อนเริ่มแบบบริหาร (คนละชุด id จึงไม่ชนกัน แต่เคลียร์ไว้ให้ชัดเจน)
     showExecLevelPopup(maxLv, function(){
       curStep=1;
       goStep(1);
@@ -866,7 +852,6 @@ function resetForm(){
   document.getElementById('success-overlay').classList.remove('show');
   PHASE='staff'; ACTIVE_COMPS=COMPS;
   document.getElementById('fformtype').value='';
-  document.getElementById('execpos-wrap').style.display='none';
   document.getElementById('fexecpos').value='';
   goStep(0);
   document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
