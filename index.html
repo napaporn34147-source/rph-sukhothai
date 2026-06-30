@@ -99,25 +99,44 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
 </head>
 <body>
 <div class="app"><div style="max-width:900px;margin:0 auto">
-
 <div class="hdr">
   <h1>🏥 แบบประเมินสมรรถนะหลัก — โรงพยาบาลสุโขทัย</h1>
   <p>Core Competency Assessment · ปีงบประมาณ 2569</p>
 </div>
-
 <div class="steps">
   <button class="sb active" onclick="goStep(0)" id="sb0">1. ข้อมูลส่วนตัว</button>
   <button class="sb" onclick="goStep(1)" id="sb1">2. ประเมินตนเอง</button>
   <button class="sb" onclick="goStep(2)" id="sb2">3. สรุปผล</button>
 </div>
-
 <div class="prog">
   <div class="prog-row"><span id="prog-txt">กรอกข้อมูลส่วนตัวก่อนเริ่มประเมิน</span><span id="prog-pct">0%</span></div>
   <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
 </div>
-
 <!-- PAGE 0: ข้อมูลส่วนตัว -->
 <div id="p0">
+  <div class="card card-pad" style="overflow:visible;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:10px">เลือกแบบประเมิน</div>
+    <div class="fgrid">
+      <div class="field full">
+        <label>ระดับการประเมิน *</label>
+        <select id="fformtype" onchange="onFormTypeChange()">
+          <option value="">— เลือกแบบประเมิน —</option>
+          <option value="0">1. ประเมินสมรรถนะหลักสำหรับผู้ปฏิบัติการ</option>
+          <option value="1">2. ประเมินสมรรถนะหลักสำหรับผู้บริหาร</option>
+          <option value="2">3. ประเมินสมรรถนะหลักสำหรับผู้ปฏิบัติการและผู้บริหาร</option>
+        </select>
+      </div>
+      <div class="field full" id="execpos-wrap" style="display:none">
+        <label>ตำแหน่งงาน (สำหรับแบบประเมินผู้บริหาร) *</label>
+        <select id="fexecpos">
+          <option value="">— เลือกตำแหน่งงาน —</option>
+          <option value="1">1. หัวหน้างาน/รองหัวหน้า</option>
+          <option value="2">2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย</option>
+          <option value="3">3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ</option>
+        </select>
+      </div>
+    </div>
+  </div>
   <div class="card card-pad" style="overflow:visible">
     <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:10px">ข้อมูลบุคลากร</div>
     <div class="fgrid">
@@ -155,7 +174,6 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
     <button class="btn-pri" onclick="next(0)">ถัดไป →</button>
   </div>
 </div>
-
 <!-- PAGE 1: ประเมินตนเอง -->
 <div id="p1" style="display:none">
   <div id="comp-wrap"></div>
@@ -164,7 +182,6 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
     <button class="btn-pri" onclick="next(1)">ดูสรุปผล →</button>
   </div>
 </div>
-
 <!-- PAGE 2: สรุปผล -->
 <div id="p2" style="display:none">
   <div id="sum-wrap"></div>
@@ -173,7 +190,6 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
     <button class="btn-pri" id="btn-submit" onclick="submitData()">✓ บันทึกส่งหัวหน้า</button>
   </div>
 </div>
-
 <!-- Loading -->
 <div class="overlay" id="overlay">
   <div class="modal">
@@ -182,7 +198,6 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
     <p>กรุณารอสักครู่</p>
   </div>
 </div>
-
 <!-- Success -->
 <div class="overlay" id="success-overlay">
   <div class="modal">
@@ -192,13 +207,11 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
     <button class="btn-pri" onclick="resetForm()" style="width:100%;margin-top:4px">ปิด</button>
   </div>
 </div>
-
 </div>
 </div>
 <script>
 // ⚠️ ใส่ URL Apps Script ที่ Deploy แล้ว
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwvqXe21qkgoVjmg2CtrXTxx3XAbG8rZYwQs-8tYdtwbaNk_5tZP-JdxDAm4fc_SiZLQg/exec';
-
 const COMPS = [
   {id:'c1',name:'1. การทำงานที่เป็นเลิศ',en:'Achieving Work Excellence',dot:'#1D9E75',
    lv1:[
@@ -289,16 +302,107 @@ const COMPS = [
      {id:'c4l3i5',n:'การถ่ายทอดและต่อยอดนวัตกรรม',d:'ถ่ายทอดและต่อยอดองค์ความรู้หรือผลงานนวัตกรรม เพื่อขยายผลการพัฒนาสู่ระดับองค์กรอย่างยั่งยืน'},
    ]},
 ];
-
+const EXEC_COMPS = [
+  {id:'e1',name:'1. การสื่อสารและการสร้างความผูกพัน',en:'Communication and Engagement',dot:'#1B3A6B',
+   lv1:[
+     {id:'e1l1i1',n:'การสื่อสารกับผู้รับบริการ',d:'สร้างสัมพันธภาพและสื่อสารกับผู้รับบริการให้เข้าใจตรงกัน เกิดความพึงพอใจและไว้วางใจ'},
+     {id:'e1l1i2',n:'การถ่ายทอดเป้าหมาย',d:'สื่อสารและอธิบายให้บุคลากรเข้าใจเป้าหมายการทำงานร่วมกัน สร้างบรรยากาศการทำงานที่ดีในหน่วยงาน'},
+     {id:'e1l1i3',n:'การขอความช่วยเหลือ',d:'สื่อสารส่งต่องานหรือขอความช่วยเหลือจากทีมและผู้เกี่ยวข้องได้อย่างชัดเจน'},
+     {id:'e1l1i4',n:'การยอมรับความต่าง',d:'ให้ความสำคัญกับความแตกต่างหลากหลาย เปิดใจรับฟัง และสนับสนุนให้บุคลากรแสดงความคิดเห็นได้อย่างเสรี'},
+     {id:'e1l1i5',n:'การสร้างความร่วมมือ',d:'ส่งเสริมให้เกิดการมีส่วนร่วมและบรรยากาศการทำงานที่ดีในหน่วยงาน'},
+   ],
+   lv2:[
+     {id:'e1l2i1',n:'การแสวงหามุมมองหลากหลาย',d:'แสวงหามุมมองที่หลากหลาย สามารถสื่อสารให้เกิดการขับเคลื่อนภารกิจของส่วนราชการได้อย่างมีประสิทธิภาพ'},
+     {id:'e1l2i2',n:'การเจรจาและโน้มน้าว',d:'ใช้ทักษะการเจรจาเพื่อโน้มน้าวและสร้างความร่วมมือทั้งภายในและภายนอกส่วนราชการ'},
+     {id:'e1l2i3',n:'การบริหารความขัดแย้ง',d:'จัดการความขัดแย้งและสร้างฉันทามติระหว่างกลุ่มผู้มีส่วนได้ส่วนเสียได้อย่างสร้างสรรค์'},
+     {id:'e1l2i4',n:'การสร้างเครือข่าย',d:'สร้างและรักษาเครือข่ายความร่วมมือที่เป็นประโยชน์ต่อการขับเคลื่อนงานขององค์กร'},
+     {id:'e1l2i5',n:'การสร้างความไว้วางใจ',d:'สร้างความไว้วางใจและความน่าเชื่อถือในฐานะผู้นำทั้งภายในและภายนอกองค์กร'},
+   ],
+   lv3:[
+     {id:'e1l3i1',n:'การส่งเสริมการสื่อสารองค์กร',d:'ส่งเสริมให้เกิดการสื่อสารที่มีประสิทธิภาพในระดับองค์กร สร้างวัฒนธรรมการสื่อสารที่เปิดกว้างและโปร่งใส'},
+     {id:'e1l3i2',n:'การสร้างพันธมิตรเชิงกลยุทธ์',d:'สร้างพันธมิตรและเครือข่ายความร่วมมือเชิงกลยุทธ์ทั้งในและต่างประเทศเพื่อพัฒนาองค์กร'},
+     {id:'e1l3i3',n:'การขับเคลื่อนผ่านการสื่อสาร',d:'ใช้การสื่อสารเป็นเครื่องมือขับเคลื่อนการเปลี่ยนแปลงและสร้างแรงบันดาลใจให้บุคลากรทุกระดับ'},
+     {id:'e1l3i4',n:'การบริหารผู้มีส่วนได้ส่วนเสีย',d:'บริหารความสัมพันธ์กับผู้มีส่วนได้ส่วนเสียทุกกลุ่มอย่างมีกลยุทธ์เพื่อบรรลุเป้าหมายองค์กร'},
+     {id:'e1l3i5',n:'การเป็นตัวแทนองค์กร',d:'เป็นตัวแทนองค์กรในเวทีต่างๆ ได้อย่างมีประสิทธิภาพ สร้างภาพลักษณ์ที่ดีให้แก่โรงพยาบาล'},
+   ]},
+  {id:'e2',name:'2. การเรียนรู้และพัฒนา',en:'Learning and Development',dot:'#0D9488',
+   lv1:[
+     {id:'e2l1i1',n:'การพัฒนาตนเอง',d:'ประเมินตนเอง วางแนวทางพัฒนา และพร้อมรับข้อเสนอแนะเพื่อเพิ่มพูนความเชี่ยวชาญและความเป็นมืออาชีพ'},
+     {id:'e2l1i2',n:'การให้ข้อมูลย้อนกลับ (Feedback)',d:'ให้ข้อมูลย้อนกลับเชิงบวกและสร้างสรรค์แก่ผู้ปฏิบัติงานเพื่อพัฒนาศักยภาพ'},
+     {id:'e2l1i3',n:'การส่งเสริมการเรียนรู้',d:'ให้ความสำคัญกับการเรียนรู้อย่างต่อเนื่องภายในหน่วยงาน เพื่อพัฒนาทักษะและพฤติกรรมการทำงาน'},
+     {id:'e2l1i4',n:'การพัฒนาคุณภาพชีวิต',d:'ส่งเสริมและผลักดันให้ผู้ใต้บังคับบัญชาได้พัฒนาคุณภาพชีวิตและความเป็นอยู่ที่ดี'},
+     {id:'e2l1i5',n:'การติดตามผลการพัฒนา',d:'ติดตามผลการพัฒนาและให้ความช่วยเหลือบุคลากรเมื่อพบอุปสรรคหรือปัญหาในการพัฒนา'},
+   ],
+   lv2:[
+     {id:'e2l2i1',n:'การพัฒนาความเชี่ยวชาญ',d:'พัฒนาตนเองให้มีความเชี่ยวชาญในงานอาชีพและเป็นที่ยอมรับของสังคม'},
+     {id:'e2l2i2',n:'การสนับสนุนการพัฒนาบุคลากร',d:'สนับสนุนและกำกับติดตามให้บุคลากรได้รับการพัฒนาคุณภาพชีวิตและคุณภาพการทำงานอย่างต่อเนื่อง'},
+     {id:'e2l2i3',n:'การสร้างแผนพัฒนาบุคลากร',d:'จัดทำแผนพัฒนาบุคลากรที่สอดคล้องกับเป้าหมายองค์กรและความต้องการของบุคลากร'},
+     {id:'e2l2i4',n:'การโค้ชและให้คำปรึกษา',d:'ทำหน้าที่โค้ชและที่ปรึกษาให้แก่บุคลากรในหน่วยงานเพื่อพัฒนาศักยภาพและสมรรถนะ'},
+     {id:'e2l2i5',n:'การถ่ายทอดความรู้',d:'ถ่ายทอดความรู้และประสบการณ์ให้แก่บุคลากรรุ่นใหม่อย่างเป็นระบบและต่อเนื่อง'},
+   ],
+   lv3:[
+     {id:'e2l3i1',n:'การสร้างวัฒนธรรมแห่งการเรียนรู้',d:'ส่งเสริมและผลักดันให้เกิดสภาพแวดล้อมและวัฒนธรรมการเรียนรู้ภายในองค์กรแบบข้ามสายงาน (Cross-functional learning) เพื่อให้เกิดการแลกเปลี่ยนองค์ความรู้และนวัตกรรม'},
+     {id:'e2l3i2',n:'การพัฒนาองค์กรแห่งการเรียนรู้',d:'นำพาองค์กรสู่การเป็นองค์กรแห่งการเรียนรู้ที่สามารถปรับตัวและพัฒนาได้อย่างต่อเนื่อง'},
+     {id:'e2l3i3',n:'การสร้างระบบจัดการความรู้',d:'สร้างระบบการจัดการความรู้ขององค์กรที่มีประสิทธิภาพและยั่งยืน'},
+     {id:'e2l3i4',n:'การพัฒนาผู้นำรุ่นใหม่',d:'ค้นหาและพัฒนาผู้นำรุ่นใหม่ (Talent Pipeline) เพื่อสืบทอดและขับเคลื่อนองค์กรในอนาคต'},
+     {id:'e2l3i5',n:'การสร้างนวัตกรรมการเรียนรู้',d:'ริเริ่มและสนับสนุนนวัตกรรมการเรียนรู้รูปแบบใหม่ที่ตอบสนองต่อการเปลี่ยนแปลงในยุคดิจิทัล'},
+   ]},
+  {id:'e3',name:'3. การปฏิรูป/ปรับเปลี่ยนราชการสู่อนาคต',en:'Transformation to the Future',dot:'#7C3AED',
+   lv1:[
+     {id:'e3l1i1',n:'การสื่อสารวิสัยทัศน์',d:'อธิบายให้บุคลากรในหน่วยงานเข้าใจทิศทางและวิสัยทัศน์ขององค์กรได้อย่างชัดเจน'},
+     {id:'e3l1i2',n:'การกำหนดเป้าหมายหน่วยงาน',d:'กำหนดเป้าหมายการทำงานของหน่วยงานให้สอดคล้องกับวิสัยทัศน์และพันธกิจขององค์กร'},
+     {id:'e3l1i3',n:'การปรับกระบวนงาน',d:'ริเริ่มสร้างสรรค์นวัตกรรม หรือปรับเปลี่ยนกระบวนงานภายในหน่วยงานให้สอดคล้องกับเป้าหมายขององค์กร'},
+     {id:'e3l1i4',n:'การสร้างการมีส่วนร่วม',d:'สนับสนุนและจูงใจให้บุคลากรเข้าใจและเป็นส่วนหนึ่งในกระบวนการเปลี่ยนแปลง'},
+     {id:'e3l1i5',n:'การใช้ดิจิทัลในการทำงาน',d:'ส่งเสริมการใช้เทคโนโลยีดิจิทัลเพื่อเพิ่มประสิทธิภาพการทำงานในหน่วยงาน'},
+   ],
+   lv2:[
+     {id:'e3l2i1',n:'การเสนอแนะปรับโครงสร้าง',d:'เสนอแนะการปรับเปลี่ยนโครงสร้างองค์กรในภาพรวมเพื่อให้คล่องตัว รองรับความเปลี่ยนแปลงในอนาคต'},
+     {id:'e3l2i2',n:'การคาดการณ์การเปลี่ยนแปลง',d:'สนับสนุนทิศทางของส่วนราชการในการสร้างหรือรับมือกับการเปลี่ยนแปลง สามารถคาดการณ์การเปลี่ยนแปลงที่อาจเกิดขึ้น'},
+     {id:'e3l2i3',n:'การนำนวัตกรรมสู่การปฏิบัติ',d:'นำนวัตกรรมและเทคโนโลยีใหม่มาประยุกต์ใช้ในการปรับปรุงกระบวนงานขององค์กรอย่างเป็นรูปธรรม'},
+     {id:'e3l2i4',n:'การบริหารการเปลี่ยนแปลง',d:'บริหารจัดการกระบวนการเปลี่ยนแปลงในองค์กรได้อย่างมีประสิทธิภาพ ลดแรงต้านและสร้างการยอมรับ'},
+     {id:'e3l2i5',n:'การใช้ข้อมูลเชิงลึก',d:'ใช้ข้อมูลเชิงลึกและการวิเคราะห์เพื่อสนับสนุนการตัดสินใจเชิงกลยุทธ์ขององค์กร'},
+   ],
+   lv3:[
+     {id:'e3l3i1',n:'การปรับโครงสร้างองค์กร',d:'ตัดสินใจปรับโครงสร้างองค์กรให้มีความคล่องตัว สอดรับกับการเปลี่ยนแปลงแห่งอนาคตได้อย่างมีประสิทธิภาพ'},
+     {id:'e3l3i2',n:'การกำหนดทิศทางเชิงกลยุทธ์',d:'กำหนดวิสัยทัศน์ ทิศทาง นโยบาย และแผนการดำเนินงานขององค์กรในระยะยาวได้อย่างชัดเจน'},
+     {id:'e3l3i3',n:'การขับเคลื่อนการปฏิรูป',d:'ขับเคลื่อนการปฏิรูปองค์กรอย่างเป็นระบบ โดยใช้ข้อมูลเชิงลึกและเทคโนโลยีดิจิทัลเป็นเครื่องมือ'},
+     {id:'e3l3i4',n:'การสร้างนวัตกรรมองค์กร',d:'สร้างสภาพแวดล้อมที่เอื้อต่อการคิดสร้างสรรค์และนวัตกรรม ผลักดันให้เกิดบริการใหม่ที่ตอบสนองความต้องการของประชาชน'},
+     {id:'e3l3i5',n:'การบูรณาการและสร้างสรรค์',d:'บูรณาการทรัพยากรและศักยภาพขององค์กรอย่างสร้างสรรค์เพื่อสร้างคุณค่าให้แก่สังคมและประชาชน'},
+   ]},
+  {id:'e4',name:'4. การรักษาวินัย คุณธรรม และจริยธรรม',en:'Disciplines, Moral and Ethics',dot:'#EA580C',
+   lv1:[
+     {id:'e4l1i1',n:'การเป็นแบบอย่าง',d:'ประพฤติตนเป็นแบบอย่างที่ดีในการรักษาวินัย คุณธรรม และมาตรฐานทางจริยธรรม'},
+     {id:'e4l1i2',n:'การกำกับดูแล',d:'ส่งเสริมและกำกับดูแลให้บุคลากรในหน่วยงานประพฤติปฏิบัติงานบนฐานของวินัย คุณธรรม และจริยธรรม'},
+     {id:'e4l1i3',n:'ความโปร่งใส',d:'ตัดสินใจเพื่อประโยชน์ของหน่วยงานและส่วนรวม โดยปราศจากอคติหรือผลประโยชน์ส่วนตน'},
+     {id:'e4l1i4',n:'ความรับผิดชอบต่อสังคม',d:'แสดงออกถึงความรับผิดชอบในบทบาทภาระหน้าที่ที่มีต่อสาธารณชน'},
+     {id:'e4l1i5',n:'ความน่าเชื่อถือ',d:'เป็นที่ไว้วางใจได้ของบุคลากรในหน่วยงานและประชาชน ด้วยการกระทำที่สอดคล้องกับหลักการและจริยธรรม'},
+   ],
+   lv2:[
+     {id:'e4l2i1',n:'การกำกับในระดับกลุ่มงาน',d:'ประพฤติปฏิบัติตนเป็นแบบอย่าง และกำกับดูแลให้บุคลากรในส่วนราชการปฏิบัติงานบนฐานของวินัย คุณธรรม และจริยธรรมอย่างเคร่งครัด'},
+     {id:'e4l2i2',n:'การสร้างวัฒนธรรมความซื่อสัตย์',d:'สร้างวัฒนธรรมองค์กรที่ยึดมั่นในความซื่อสัตย์ โปร่งใส และรับผิดชอบในทุกระดับ'},
+     {id:'e4l2i3',n:'การบริหารความเสี่ยงด้านจริยธรรม',d:'ระบุและบริหารจัดการความเสี่ยงด้านจริยธรรมและการทุจริตในองค์กรอย่างเป็นระบบ'},
+     {id:'e4l2i4',n:'การสร้างความรับผิดชอบ',d:'สร้างระบบความรับผิดชอบ (Accountability) ที่ชัดเจนในทุกระดับขององค์กร'},
+     {id:'e4l2i5',n:'การรายงานและความโปร่งใส',d:'ส่งเสริมการรายงานที่โปร่งใสและถูกต้องต่อสาธารณะและผู้มีส่วนได้ส่วนเสีย'},
+   ],
+   lv3:[
+     {id:'e4l3i1',n:'การกำกับในระดับองค์กร',d:'กำกับดูแลการบริหารราชการให้เป็นไปตามหลักธรรมาภิบาล วินัย คุณธรรม และจริยธรรมในระดับองค์กร'},
+     {id:'e4l3i2',n:'การสร้างระบบป้องกันการทุจริต',d:'วางระบบและกลไกป้องกันการทุจริตและประพฤติมิชอบในองค์กรอย่างมีประสิทธิภาพ'},
+     {id:'e4l3i3',n:'การส่งเสริมธรรมาภิบาล',d:'ส่งเสริมและขับเคลื่อนหลักธรรมาภิบาลในการบริหารองค์กรให้เป็นที่ยอมรับของสังคม'},
+     {id:'e4l3i4',n:'การสร้างวัฒนธรรมองค์กรที่ดี',d:'สร้างวัฒนธรรมองค์กรที่มุ่งเน้นคุณธรรม จริยธรรม และการบริการประชาชนอย่างยั่งยืน'},
+     {id:'e4l3i5',n:'ความรับผิดชอบต่อสาธารณะ',d:'แสดงความรับผิดชอบสูงสุดต่อสาธารณะในฐานะผู้บริหารองค์กร ยึดหลักการบริหารกิจการบ้านเมืองที่ดี'},
+   ]},
+];
 let curStep=0, maxLv=1;
 const TH={1:5,2:4,3:4};
 const gv=id=>document.getElementById(id)?.value||'';
 const gc=id=>document.getElementById(id)?.checked||false;
-const getScore=(cid,lv)=>COMPS.find(c=>c.id===cid)[`lv${lv}`].filter(it=>gc(it.id)).length;
+let ACTIVE_COMPS = COMPS;     // ชุดสมรรถนะที่กำลังประเมินอยู่ ณ ขณะนี้
+let PHASE = 'staff';           // 'staff' | 'exec' — ใช้ติดตามว่าตอนนี้กำลังประเมินแบบไหน
+let EXEC_LEVEL = 1;            // ระดับของผู้บริหาร (มาจากตำแหน่งงานที่เลือก ไม่ใช่อายุงาน)
+const getScore=(cid,lv)=>ACTIVE_COMPS.find(c=>c.id===cid)[`lv${lv}`].filter(it=>gc(it.id)).length;
 const lvPassed=(cid,lv)=>getScore(cid,lv)>=TH[lv];
-const allLv1Pass=()=>COMPS.every(c=>lvPassed(c.id,1));
-const allLv2Pass=()=>COMPS.every(c=>lvPassed(c.id,2));
-
+const allLv1Pass=()=>ACTIVE_COMPS.every(c=>lvPassed(c.id,1));
+const allLv2Pass=()=>ACTIVE_COMPS.every(c=>lvPassed(c.id,2));
 // คำนวณระดับจากอายุงาน
 function getLevelFromExp(exp){
   var e=parseFloat(exp)||0;
@@ -306,7 +410,6 @@ function getLevelFromExp(exp){
   if(e<=5) return 2;
   return 3;
 }
-
 function updateProg(){
   const pct=[0,40,90][curStep];
   const txts=['กรอกข้อมูลส่วนตัวก่อนเริ่มประเมิน','ประเมินตัวชี้วัดแต่ละสมรรถนะ','สรุปผลการประเมิน'];
@@ -318,7 +421,6 @@ function updateProg(){
     document.getElementById(id).classList.toggle('done',i<curStep);
   });
 }
-
 function goStep(n){
   curStep=n;
   ['p0','p1','p2'].forEach((id,i)=>document.getElementById(id).style.display=i===n?'':'none');
@@ -327,20 +429,22 @@ function goStep(n){
   if(n===2) renderSum();
   window.scrollTo(0,0);
 }
-
 function validateEmpId(el){
   el.value = el.value.replace(/[^0-9]/g,'');
   const ok = /^\d{5}$/.test(el.value);
   el.classList.toggle('error', el.value.length > 0 && !ok);
   document.getElementById('fi-err').classList.toggle('show', el.value.length > 0 && !ok);
 }
-
+function onFormTypeChange(){
+  const ft = gv('fformtype');
+  // แสดงตำแหน่งงานในหน้าแรกเฉพาะกรณีเลือก "เฉพาะผู้บริหาร" (ft==='1')
+  // กรณี "ทั้งสองแบบ" (ft==='2') จะถามตำแหน่งงานทีหลัง หลัง submit ปฏิบัติการ
+  document.getElementById('execpos-wrap').style.display = (ft==='1') ? '' : 'none';
+}
 const DEPT_LIST=['กลุ่มงานบริหารทั่วไป','กลุ่มงานโครงสร้างพื้นฐานและวิศวกรรมทางการแพทย์','กลุ่มงานทรัพยากรบุคคล','กลุ่มงานพัสดุ','กลุ่มงานการเงิน','กลุ่มงานบัญชี','กลุ่มงานเวชกรรมสังคม','กลุ่มงานอาชีวเวชกรรม','กลุ่มงานการแพทย์แผนไทยและแพทย์ทางเลือก','กลุ่มงานสุขศึกษา','กลุ่มงานการพยาบาลชุมชน','กลุ่มงานการพยาบาลวิสัญญี','กลุ่มงานการพยาบาลผู้ป่วยห้องผ่าตัด','กลุ่มงานการพยาบาลผู้ป่วยสูติ-นรีเวช','กลุ่มงานการพยาบาลผู้ป่วยอุบัติเหตุและฉุกเฉิน','กลุ่มงานการพยาบาลผู้ป่วยออร์โธปิดิกส์','กลุ่มงานการพยาบาลด้านการควบคุมและป้องกันการติดเชื้อ','กลุ่มงานการพยาบาลผู้ป่วยศัลยกรรม','กลุ่มงานการพยาบาลผู้ป่วยหนัก','กลุ่มงานการพยาบาลตรวจรักษาพิเศษ','กลุ่มงานการพยาบาลผู้ป่วยอายุรกรรม','กลุ่มงานการพยาบาลผู้ป่วยนอก','กลุ่มงานการพยาบาลผู้ป่วย โสต ศอ นาสิก จักษุ','กลุ่มงานการพยาบาลผู้ป่วยกุมารเวชกรรม','กลุ่มงานการพยาบาลผู้คลอด','กลุ่มงานการพยาบาลจิตเวช','กลุ่มงานวิจัยและพัฒนาการพยาบาล','กลุ่มงานกายภาพบำบัด','กลุ่มงานเวชศาสตร์ฉุกเฉิน','กลุ่มงานอายุรกรรม','กลุ่มงานศัลยกรรม','กลุ่มงานศัลยกรรมออร์โธปิดิกส์','กลุ่มงานกุมารเวชกรรม','กลุ่มงานจักษุวิทยา','กลุ่มงานโสต ศอ นาสิก','กลุ่มงานโภชนศาสตร์','กลุ่มงานเทคนิคการแพทย์และพยาธิวิทยาคลินิก','กลุ่มงานพยาธิวิทยากายวิภาค','กลุ่มงานสูติ-นรีเวชกรรม','กลุ่มงานวิสัญญีวิทยา','กลุ่มงานรังสีวิทยา','กลุ่มงานบริการทันตกรรมตติยภูมิและศูนย์ความเป็นเลิศ','กลุ่มงานจิตเวชและยาเสพติด','กลุ่มงานเวชกรรมฟื้นฟู','กลุ่มงานเภสัชกรรม','กลุ่มงานสังคมสงเคราะห์','กลุ่มงานเวชระเบียนและข้อมูลทางการแพทย์','กลุ่มงานประกันสุขภาพ','กลุ่มงานยุทธศาสตร์และแผนงานโครงการ','กลุ่มงานพัฒนาทรัพยากรบุคคล','กลุ่มงานพัฒนาคุณภาพบริการและมาตรฐาน','กลุ่มงานผู้ป่วยนอก (ปฐมภูมิ)','สำนักงานกลุ่มการพยาบาล','กลุ่มงานนิติเวช','กลุ่มงานเทคโนโลยีสารสนเทศ','กลุ่มงานสุขภาพดิจิทัล','กลุ่มงานบริการทันตกรรมปฐมภูมิและทุติยภูมิ','กลุ่มงานพัฒนาคุณภาพบริการและวิชาการทันตกรรม'];
 const HEAD_LIST=['นายสุนทร อินทพิบูลย์','นางกนกพจน์ มีวัฒนา','นายปรีชา ภิญโญพรพาณิชย์','นางรตินันทน์ เตชะสืบ','นายพงศ์กฤช เนียมหุ่น','นางรุ่งทิพย์ พงศ์กิจการเจริญ','นายครรชิต สุวรรณาลัย','นายเสถียรพงศ์ ตรีกุย','นางศุภานัน ปานประภากร','นายวสุธนวรรธน์ เอี่ยมประพันธ์','นางสาวศิริวรรณ คะเนนอก','นางวรางคณา วสุรัตน์','นางสาวชนม์พรรษ์ ลิปิกรโกศล','นางกัญญา คงเจริญ','นางสาวมาลี ด้วงพรม','นางสาวณัฐยาภรณ์ ทรงธรรม','นางศุภพร ไพรอุดม','นางพัชรี ชัยวัฒนกุล','นางภัทราวรรณ ศิรินันทยา','นางทัศนีย์ แสงเงิน','นางสาวฐิติมา ขอบเขตต์','นางสาวทิพารัตน์ หมื่นมะโน','นางอภัณตรี อินสอน','นางชูจิตร วงศ์คำ','นางมยุรี มะโนวรรณ์','นางสาวอำพัน วินิยม','นางนุจรี นิช่างทอง','นางเพ็ญพรรณ วัฒนา','นางสาวกาญจนา พยัคฆ์','นางสาวอานุภาพ กันทะวงค์','นางพรรณราย สายเนตร','นางสาวพัชรี กระชั้น','นางสถาพร จูทอง','นางดิฐี ไชยเพชร','นายธเนศ แตกฉาน','นางวารุณีย์ อภิวงศ์สุวรรณ','นางสาวสโรบล อยู่สำราญ','นางสาวสุนทรีย์ ลื้อยอด','นายสมชาย เขียวริด','นายฉลอง จันทร์พะโยม','นางณัฐพร เนียมหุ่น','นายณัฐวุฒิ สินสุวรรณ','นายสุเปรม หนูเมือง','นางสาววราพรรณ บุญคง','นางอรอุมา นันทา','นายจารุบุตร พิสุทธิ์รัตนาภรณ์','นายรุ่ง ทานะมัย','นางศิริรัตน์ ศิรินวล','นางสาวสุมาลี กุละพัฒน์','นายจิณณะ ศรีแจ่มดี','นางสาวอุไร ชาญตระกูล','นางทิพสุดา อู่วุฒิพงษ์','นางพรรณวิภา แจ่มทุ่ง','นางวิมล อินสวน','นางสาวประไพรัตน์ เหมราช','นางสาวสุทัชชา ฉัตรไชยาฤกษ์','นางมีนา นาคร','นายสุพัฒน์ ปัญญานุกุล','นายพิเศษ อินสวน','นายสาธิต พรพัฒนารักษ์','นางพรรณนิภา ช่วยเพ็ญ','นายเกริกชัย บูชาเกียรติ','นางณินญาภร ใจยอด','นายกวิน ก้านแก้ว','นายเชิดศักดิ์ ศักดิ์ลอ','นายบัณฑิต ฉิมอำพันธ์','นางนวลพรรณ จิ๋วปัญญา','นางสาววรรณริชฎา กิตติธงโสภณ','นางเกษนภา กิ่งก้าน','นางสุณัฏฐา อิ่มเอม','นางวันทนีย์ พีธรากร','นางกัลยาณี ตรีธรรมพินิจ','นายบุญช่วย เรืองคำ','นางสาวศิริลักษณ์ อุปวาณิช','นางภาวีนัส คำพวง'];
 const dropHi={fd:-1,fs:-1};
-
 function getDropList(id){return id==='fd'?DEPT_LIST:HEAD_LIST;}
-
 function renderDropItems(id,q){
   const drop=document.getElementById(id+'-drop');
   const list=getDropList(id);
@@ -355,29 +459,24 @@ function renderDropItems(id,q){
     }).join('');
   }
 }
-
 function filterDrop(id){
   const q=document.getElementById(id+'-txt').value;
   document.getElementById(id).value='';
   renderDropItems(id,q);
   document.getElementById(id+'-drop').classList.add('open');
 }
-
 function openDrop(id){
   renderDropItems(id,document.getElementById(id+'-txt').value);
   document.getElementById(id+'-drop').classList.add('open');
 }
-
 function closeDrop(id){
   setTimeout(()=>document.getElementById(id+'-drop').classList.remove('open'),200);
 }
-
 function selectDrop(id,val){
   document.getElementById(id+'-txt').value=val;
   document.getElementById(id).value=val;
   document.getElementById(id+'-drop').classList.remove('open');
 }
-
 function keyDrop(e,id){
   const drop=document.getElementById(id+'-drop');
   const opts=drop.querySelectorAll('.srch-opt');
@@ -400,9 +499,14 @@ function keyDrop(e,id){
     drop.classList.remove('open');
   }
 }
-
 function next(from){
   if(from===0){
+    const ft = gv('fformtype');
+    if(!ft){
+      alert('กรุณาเลือกแบบประเมินก่อน');
+      document.getElementById('fformtype').focus();
+      return;
+    }
     const focusEl={fd:'fd-txt',fs:'fs-txt'};
     const req=['fi','fp','ff','fl','fd','fe','fs'];
     for(const id of req){
@@ -422,14 +526,69 @@ function next(from){
       el.focus();
       return;
     }
-    maxLv=getLevelFromExp(gv('fe'));
-    // แสดง popup ระดับก่อนไปประเมิน
-    showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
+    // ft==='1' (เฉพาะผู้บริหาร) ต้องเลือกตำแหน่งงานในหน้านี้ด้วย
+    if(ft==='1' && !gv('fexecpos')){
+      alert('กรุณาเลือกตำแหน่งงาน');
+      document.getElementById('fexecpos').focus();
+      return;
+    }
+
+    if(ft==='0'){
+      // เฉพาะผู้ปฏิบัติการ
+      PHASE='staff'; ACTIVE_COMPS=COMPS;
+      maxLv=getLevelFromExp(gv('fe'));
+      showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
+    } else if(ft==='1'){
+      // เฉพาะผู้บริหาร
+      PHASE='exec'; ACTIVE_COMPS=EXEC_COMPS;
+      maxLv=parseInt(gv('fexecpos'))||1; EXEC_LEVEL=maxLv;
+      showExecLevelPopup(maxLv, function(){ goStep(1); });
+    } else {
+      // ทั้งสองแบบ — เริ่มจากผู้ปฏิบัติการก่อนเสมอ
+      PHASE='staff'; ACTIVE_COMPS=COMPS;
+      maxLv=getLevelFromExp(gv('fe'));
+      showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
+    }
     return;
   }
   goStep(from+1);
 }
-
+function showExecLevelPopup(lv, onConfirm){
+  const posText = {1:'1. หัวหน้างาน/รองหัวหน้า',2:'2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย',3:'3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ'}[lv];
+  const lvDesc = lv===1
+    ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1</strong> เกณฑ์ผ่าน <strong>5/5</strong> ทุกสมรรถนะ'
+    : lv===2
+    ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1 และ 2</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2 ผ่านเมื่อได้ <strong>4/5</strong>'
+    : 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1, 2 และ 3</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2–3 ผ่านเมื่อได้ <strong>4/5</strong>';
+  const lvColor = lv===1?'#1E3A8A':lv===2?'#065F46':'#4C1D95';
+  const lvBg    = lv===1?'#EFF6FF':lv===2?'#E1F5EE':'#F5F3FF';
+  let modal = document.getElementById('exec-level-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'exec-level-modal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;font-family:Sarabun,sans-serif';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:380px;width:92%;text-align:center">
+        <div style="font-size:40px;margin-bottom:10px">🧑‍💼</div>
+        <div id="elv-badge" style="display:inline-block;padding:4px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:12px"></div>
+        <div style="font-size:17px;font-weight:600;color:#111827;margin-bottom:8px">เริ่มแบบประเมินผู้บริหาร</div>
+        <div id="elv-pos" style="font-size:13px;color:#6B7280;margin-bottom:10px"></div>
+        <div id="elv-desc" style="font-size:13px;color:#374151;line-height:1.7;background:#F9FAFB;border-radius:8px;padding:10px 14px;margin-bottom:20px;text-align:left"></div>
+        <button id="elv-confirm" style="width:100%;padding:12px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:Sarabun,sans-serif">เริ่มประเมินผู้บริหาร →</button>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('elv-badge').textContent = 'ระดับ '+lv;
+  document.getElementById('elv-badge').style.background = lvBg;
+  document.getElementById('elv-badge').style.color = lvColor;
+  document.getElementById('elv-pos').textContent = 'ตำแหน่งงาน: '+posText;
+  document.getElementById('elv-desc').innerHTML = lvDesc;
+  document.getElementById('elv-confirm').onclick = function(){
+    modal.style.display = 'none';
+    onConfirm();
+  };
+  modal.style.display = 'flex';
+}
 function showLevelPopup(lv, exp, onConfirm){
   const lvText = lv===1
     ? 'ระดับ 1 (อายุงานน้อยกว่า 3 ปี)'
@@ -443,7 +602,6 @@ function showLevelPopup(lv, exp, onConfirm){
     : 'ท่านต้องประเมิน <strong>ระดับ 1, 2 และ 3</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2–3 ผ่านเมื่อได้ <strong>4/5</strong>';
   const lvColor = lv===1?'#1E3A8A':lv===2?'#065F46':'#4C1D95';
   const lvBg    = lv===1?'#EFF6FF':lv===2?'#E1F5EE':'#F5F3FF';
-
   // สร้าง modal
   let modal = document.getElementById('level-modal');
   if(!modal){
@@ -461,7 +619,6 @@ function showLevelPopup(lv, exp, onConfirm){
       </div>`;
     document.body.appendChild(modal);
   }
-
   document.getElementById('lv-badge').textContent = lvText;
   document.getElementById('lv-badge').style.background = lvBg;
   document.getElementById('lv-badge').style.color = lvColor;
@@ -474,11 +631,10 @@ function showLevelPopup(lv, exp, onConfirm){
   };
   modal.style.display = 'flex';
 }
-
 function renderAssess(){
   const lv=maxLv;
   let html='';
-  COMPS.forEach(comp=>{
+  ACTIVE_COMPS.forEach(comp=>{
     html+=`<div class="card" style="margin-bottom:10px">
       <div class="comp-hdr">
         <div class="comp-dot" style="background:${comp.dot}"></div>
@@ -527,12 +683,11 @@ function renderAssess(){
     </div>`;
   });
   document.getElementById('comp-wrap').innerHTML=html;
-  COMPS.forEach(c=>refreshPills(c.id));
+  ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
 }
-
 function saveState(){
   var state={};
-  COMPS.forEach(comp=>{
+  ACTIVE_COMPS.forEach(comp=>{
     state[comp.id]={};
     [1,2,3].forEach(l=>{
       state[comp.id]['lv'+l]=comp['lv'+l].map(it=>document.getElementById(it.id)?.checked||false);
@@ -540,9 +695,8 @@ function saveState(){
   });
   return state;
 }
-
 function restoreState(state){
-  COMPS.forEach(comp=>{
+  ACTIVE_COMPS.forEach(comp=>{
     [1,2,3].forEach(l=>{
       var vals=state[comp.id]?.['lv'+l]||[];
       comp['lv'+l].forEach((it,i)=>{
@@ -552,7 +706,6 @@ function restoreState(state){
     });
   });
 }
-
 function scrollToLevel(lv){
   // เลื่อนหน้าจอไปยังสมรรถนะที่ 1 ของระดับ lv
   setTimeout(function(){
@@ -561,18 +714,16 @@ function scrollToLevel(lv){
     else { window.scrollTo({top:0, behavior:'smooth'}); }
   }, 150);
 }
-
 function onTick(cid,lv){
-  COMPS.forEach(c=>refreshPills(c.id));
+  ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
   if(lv===1&&allLv1Pass()&&maxLv>=2){
-    var st=saveState(); renderAssess(); restoreState(st); COMPS.forEach(c=>refreshPills(c.id));
+    var st=saveState(); renderAssess(); restoreState(st); ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
     scrollToLevel(2);
   } else if(lv===2&&allLv2Pass()&&maxLv>=3){
-    var st=saveState(); renderAssess(); restoreState(st); COMPS.forEach(c=>refreshPills(c.id));
+    var st=saveState(); renderAssess(); restoreState(st); ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
     scrollToLevel(3);
   }
 }
-
 function refreshPills(cid){
   const lv=maxLv;
   let pills='';
@@ -591,20 +742,23 @@ function refreshPills(cid){
     else ban.style.display='none';
   }
 }
-
 function renderSum(){
   const lv=maxLv;
   let allPass=true;
+  const posLabel = {1:'หัวหน้างาน/รองหัวหน้า',2:'หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย',3:'หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ'};
+  const phaseTitle = PHASE==='exec' ? 'สรุปผลการประเมินสมรรถนะหลัก — ผู้บริหาร' : 'สรุปผลการประเมินสมรรถนะหลัก — ผู้ปฏิบัติการ';
   let html=`<div class="card card-pad" style="margin-bottom:10px">
-    <div style="font-size:14px;font-weight:600;margin-bottom:10px">สรุปผลการประเมินสมรรถนะหลัก</div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">${phaseTitle}</div>
     <div class="sum-box">
       <div class="sum-row"><span>ชื่อ-นามสกุล</span><span style="font-weight:600">${gv('fp')}${gv('ff')} ${gv('fl')}</span></div>
       <div class="sum-row"><span>กลุ่มงาน</span><span>${gv('fd')}</span></div>
-      <div class="sum-row"><span>อายุงาน</span><span>${gv('fe')} ปี</span></div>
+      ${PHASE==='exec'
+        ? `<div class="sum-row"><span>ตำแหน่งงาน</span><span>${posLabel[lv]||''}</span></div>`
+        : `<div class="sum-row"><span>อายุงาน</span><span>${gv('fe')} ปี</span></div>`}
       <div class="sum-row"><span>ระดับที่ประเมิน</span><span>1–${lv}</span></div>
       <div class="sum-row"><span>หัวหน้า</span><span>${gv('fs')}</span></div>
     </div>`;
-  COMPS.forEach(comp=>{
+  ACTIVE_COMPS.forEach(comp=>{
     let compPass=true,rows='';
     for(let l=1;l<=lv;l++){
       const sc=getScore(comp.id,l),th=TH[l],pass=sc>=th;
@@ -629,21 +783,26 @@ function renderSum(){
   </div></div>`;
   document.getElementById('sum-wrap').innerHTML=html;
 }
-
 async function submitData(){
   const btn=document.getElementById('btn-submit');
   btn.disabled=true;
   document.getElementById('overlay').classList.add('show');
   const lv=maxLv;
+  const ft = gv('fformtype'); // 0=ปฏิบัติการ, 1=บริหาร, 2=ทั้งสอง
+  const formNames = {0:'ผู้ปฏิบัติการ',1:'ผู้บริหาร',2:'ผู้ปฏิบัติการและผู้บริหาร'};
   const payload={
     timestamp: new Date().toISOString(),
     empId: gv('fi'), prefix: gv('fp'),
     fname: gv('ff'), lname: gv('fl'),
     dept: gv('fd'), exp: gv('fe'),
     level: lv, supervisor: gv('fs'),
+    formType: ft,
+    formTypeName: formNames[ft],
+    assessKind: PHASE,                          // 'staff' หรือ 'exec' — บอกว่าแถวนี้คือผลของแบบไหน
+    execPosition: PHASE==='exec' ? (gv('fexecpos')||String(EXEC_LEVEL)) : '-',
     scores: {}
   };
-  COMPS.forEach(comp=>{
+  ACTIVE_COMPS.forEach(comp=>{
     payload.scores[comp.id]={};
     for(let l=1;l<=3;l++){
       payload.scores[comp.id][`lv${l}`]=comp[`lv${l}`].map(it=>gc(it.id)?1:0);
@@ -652,20 +811,65 @@ async function submitData(){
   try {
     await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),mode:'no-cors'});
     document.getElementById('overlay').classList.remove('show');
-    document.getElementById('success-overlay').classList.add('show');
+
+    if(ft==='2' && PHASE==='staff'){
+      // ส่งแบบปฏิบัติการเสร็จแล้ว ถ้าเลือก "ทั้งสองแบบ" ให้ต่อด้วยแบบบริหารทันที
+      btn.disabled=false;
+      askExecPositionThenContinue();
+    } else {
+      document.getElementById('success-overlay').classList.add('show');
+    }
   } catch(err) {
     document.getElementById('overlay').classList.remove('show');
     alert('เกิดข้อผิดพลาด: '+err.message);
   }
   btn.disabled=false;
 }
-
+function askExecPositionThenContinue(){
+  let modal = document.getElementById('exec-ask-modal');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'exec-ask-modal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;font-family:Sarabun,sans-serif';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:16px;padding:28px 24px;max-width:380px;width:92%;text-align:center">
+        <div style="font-size:40px;margin-bottom:10px">✅</div>
+        <div style="font-size:17px;font-weight:600;color:#111827;margin-bottom:6px">บันทึกแบบปฏิบัติการสำเร็จ</div>
+        <div style="font-size:13px;color:#6B7280;margin-bottom:18px">กรุณาเลือกตำแหน่งงานเพื่อประเมินต่อในส่วนผู้บริหาร</div>
+        <select id="exec-ask-pos" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-size:15px;font-family:Sarabun,sans-serif;margin-bottom:16px">
+          <option value="">— เลือกตำแหน่งงาน —</option>
+          <option value="1">1. หัวหน้างาน/รองหัวหน้า</option>
+          <option value="2">2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย</option>
+          <option value="3">3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ</option>
+        </select>
+        <button id="exec-ask-confirm" style="width:100%;padding:12px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:Sarabun,sans-serif">ถัดไป →</button>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('exec-ask-confirm').onclick = function(){
+    const pos = document.getElementById('exec-ask-pos').value;
+    if(!pos){ alert('กรุณาเลือกตำแหน่งงาน'); return; }
+    document.getElementById('fexecpos').value = pos;
+    modal.style.display='none';
+    PHASE='exec'; ACTIVE_COMPS=EXEC_COMPS;
+    maxLv=parseInt(pos); EXEC_LEVEL=maxLv;
+    // ล้าง checkbox ของแบบปฏิบัติการก่อนเริ่มแบบบริหาร (คนละชุด id จึงไม่ชนกัน แต่เคลียร์ไว้ให้ชัดเจน)
+    showExecLevelPopup(maxLv, function(){
+      curStep=1;
+      goStep(1);
+    });
+  };
+  modal.style.display = 'flex';
+}
 function resetForm(){
   document.getElementById('success-overlay').classList.remove('show');
+  PHASE='staff'; ACTIVE_COMPS=COMPS;
+  document.getElementById('fformtype').value='';
+  document.getElementById('execpos-wrap').style.display='none';
+  document.getElementById('fexecpos').value='';
   goStep(0);
   document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
 }
-
 updateProg();
 </script>
 </body>
