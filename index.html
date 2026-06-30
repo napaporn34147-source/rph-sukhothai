@@ -671,25 +671,21 @@ function renderAssess(){
       });
       html+=`</div>`;
 
-      // ปุ่ม "ระดับถัดไป" ใต้สมรรถนะสุดท้าย ของระดับปัจจุบันที่ยังไม่ล็อก
+      // ปุ่ม "ระดับถัดไป" และ "ส่งผลเท่าที่ทำได้" ใต้สมรรถนะสุดท้าย ของระดับปัจจุบันที่ยังไม่ล็อก
       const isLastComp = ci===ACTIVE_COMPS.length-1;
       if(isLastComp && !isLocked){
         const canGoNext = lvAllPass(l);
         const hasNextLevel = l<lv;
         if(hasNextLevel){
-          if(canGoNext){
-            html+=`<div style="padding:14px 18px;border-top:1px solid #F3F4F6;text-align:right">
-              <button class="btn-pri" id="btn-next-lv-${l}" onclick="confirmNextLevel(${l})">
-                ระดับถัดไป →
-              </button>
-            </div>`;
-          } else {
-            html+=`<div style="padding:14px 18px;border-top:1px solid #F3F4F6">
-              <button class="btn-pri" id="btn-next-lv-${l}" disabled style="width:100%;background:#9CA3AF;cursor:not-allowed">ระดับถัดไป →</button>
-              <div style="font-size:11px;color:#9CA3AF;margin-top:6px;margin-bottom:10px">ต้องผ่านเกณฑ์ขั้นต่ำครบทั้ง 4 สมรรถนะก่อนจึงจะไปต่อได้</div>
-              <button class="btn-sec" style="width:100%" onclick="confirmStopHere(${l})">📤 ส่งผลเท่าที่ทำได้ (ถึงระดับ ${l})</button>
-            </div>`;
-          }
+          const nextBtnStyle = canGoNext ? '' : 'background:#9CA3AF;cursor:not-allowed';
+          const stopBtnStyle = canGoNext ? 'background:#9CA3AF;color:#fff;cursor:not-allowed;border:none' : '';
+          html+=`<div style="padding:14px 18px;border-top:1px solid #F3F4F6">
+            <div style="display:flex;gap:10px">
+              <button class="btn-sec" id="btn-stop-lv-${l}" ${canGoNext?'disabled':''} style="flex:1;${stopBtnStyle}" onclick="confirmStopHere(${l})">📤 ส่งผลเท่าที่ทำได้</button>
+              <button class="btn-pri" id="btn-next-lv-${l}" ${canGoNext?'':'disabled'} style="flex:1;${nextBtnStyle}" onclick="confirmNextLevel(${l})">ระดับถัดไป →</button>
+            </div>
+            ${canGoNext?'':'<div style="font-size:11px;color:#9CA3AF;margin-top:6px">ต้องผ่านเกณฑ์ขั้นต่ำครบทั้ง 4 สมรรถนะก่อนจึงจะกด \"ระดับถัดไป\" ได้</div>'}
+          </div>`;
         }
       }
     });
@@ -705,6 +701,7 @@ function confirmNextLevel(l){
   scrollToTop();
 }
 function confirmStopHere(l){
+  if(lvAllPass(l)) return;
   if(!confirm('ท่านยังไม่ผ่านเกณฑ์ขั้นต่ำของระดับ '+l+' ต้องการส่งผลเท่าที่ทำได้ (ถึงระดับ '+l+' เท่านั้น ไม่รวมระดับที่สูงกว่า) ใช่หรือไม่?')) return;
   STOPPED_AT = l;
   LOCKED_LEVELS[l]=true;
@@ -735,7 +732,7 @@ function scrollToTop(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function onTick(cid,lv){
-  // อัปเดต pill คะแนนของทุกสมรรถนะในระดับนี้ และเปิด/ปิดปุ่ม "ระดับถัดไป" ตามเกณฑ์
+  // อัปเดต pill คะแนนของทุกสมรรถนะในระดับนี้ และสลับสถานะปุ่ม "ระดับถัดไป" / "ส่งผลเท่าที่ทำได้" ตามเกณฑ์
   ACTIVE_COMPS.forEach(comp=>{
     const sc=getScore(comp.id,lv),th=TH[lv],pass=sc>=th;
     const pillEl=document.querySelector(`#lb-${comp.id}-${lv} .pill`);
@@ -744,13 +741,21 @@ function onTick(cid,lv){
       pillEl.textContent = sc===0?`0/${th}`:`${sc}/${th} ${pass?'✓':'✗'}`;
     }
   });
-  const btn=document.getElementById('btn-next-lv-'+lv);
-  if(btn){
-    const can=lvAllPass(lv);
-    btn.disabled=!can;
-    btn.style.cssText = can ? '' : 'background:#9CA3AF;cursor:not-allowed';
-    const hint=btn.parentElement.querySelector('div');
-    if(hint) hint.style.display = can ? 'none' : '';
+  const can=lvAllPass(lv);
+  const nextBtn=document.getElementById('btn-next-lv-'+lv);
+  const stopBtn=document.getElementById('btn-stop-lv-'+lv);
+  if(nextBtn){
+    nextBtn.disabled=!can;
+    nextBtn.style.cssText = 'flex:1;'+(can ? '' : 'background:#9CA3AF;cursor:not-allowed');
+  }
+  if(stopBtn){
+    stopBtn.disabled=can;
+    stopBtn.style.cssText = 'flex:1;'+(can ? 'background:#9CA3AF;color:#fff;cursor:not-allowed;border:none' : '');
+  }
+  const hintWrap = nextBtn ? nextBtn.closest('div[style*="border-top"]') : null;
+  if(hintWrap){
+    const hint = hintWrap.querySelector('div:last-child');
+    if(hint && hint!==hintWrap.firstElementChild) hint.style.display = can ? 'none' : '';
   }
 }
 function refreshPills(cid){
