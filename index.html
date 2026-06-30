@@ -690,6 +690,11 @@ function restoreState(state){
     });
   });
 }
+function scrollToTop(){
+  setTimeout(function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  }, 150);
+}
 function scrollToLevel(lv){
   // เลื่อนหน้าจอไปยังสมรรถนะที่ 1 ของระดับ lv (ใช้ id แรกของ ACTIVE_COMPS ปัจจุบัน ไม่ fix เป็น c1)
   setTimeout(function(){
@@ -703,7 +708,8 @@ function onTick(cid,lv){
   ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
   if(lv===1&&allLv1Pass()&&maxLv>=2){
     var st=saveState(); renderAssess(); restoreState(st); ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
-    scrollToLevel(2);
+    // ผ่านระดับ 1 → เด้งกลับขึ้นบนสุดของหน้าเสมอ (หัวข้อสมรรถนะที่ 1)
+    scrollToTop();
   } else if(lv===2&&allLv2Pass()&&maxLv>=3){
     var st=saveState(); renderAssess(); restoreState(st); ACTIVE_COMPS.forEach(c=>refreshPills(c.id));
     scrollToLevel(3);
