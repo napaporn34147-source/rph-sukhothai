@@ -675,9 +675,9 @@ function renderAssess(){
     const th=TH[l];
     const withinOwnLevel = l<=maxLv;
     html+=`<div class="card" style="margin-bottom:10px" id="lvcard-${l}">`;
-    html+=`<div style="padding:10px 18px;background:${withinOwnLevel?'#EFF6FF':'#F9FAFB'};border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center">
-      <span class="badge b${l}">ระดับ ${l}${withinOwnLevel?'':' (เกินเกณฑ์ของท่าน — ไม่บังคับ)'}</span>
-      <span style="font-size:11px;color:#9CA3AF">เกณฑ์ผ่าน ${th}/5</span>
+    html+=`<div style="padding:14px 18px;background:${withinOwnLevel?'#EFF6FF':'#F9FAFB'};border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center">
+      <span class="badge b${l}" style="font-size:22px;padding:6px 16px;font-weight:700">ระดับ ${l}${withinOwnLevel?'':' <span style=\"font-size:13px;font-weight:400\">(เกินเกณฑ์ของท่าน — ไม่บังคับ)</span>'}</span>
+      <span style="font-size:15px;color:#6B7280;font-weight:600">เกณฑ์ผ่าน ${th}/5</span>
     </div>`;
 
     ACTIVE_COMPS.forEach((comp)=>{
@@ -838,6 +838,7 @@ async function submitData(){
     assessKind: PHASE,                          // 'staff' หรือ 'exec' — บอกว่าแถวนี้คือผลของแบบไหน
     execPosition: PHASE==='exec' ? (gv('fexecpos')||String(EXEC_LEVEL)) : '-',
     staffPosCode: (PHASE==='staff' && gv('fpos')) ? (POS_TO_BV[gv('fpos')]||'-') : '-', // รหัสตำแหน่งงานผู้ปฏิบัติการ (01/02/03) เก็บลงคอลัมน์ BV
+    staffPosition: (PHASE==='staff' && gv('fpos')) ? gv('fpos') : '-', // ชื่อตำแหน่งงานจริงที่เลือก เก็บลงคอลัมน์ BW
     scores: {}
   };
   ACTIVE_COMPS.forEach(comp=>{
