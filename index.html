@@ -389,15 +389,17 @@ const EXEC_COMPS = [
      {id:'e4l3i5',n:'ความไว้วางใจจากสังคม',d:'เป็นที่ไว้วางใจได้ของบุคลากรในองค์กรและประชาชนอย่างเต็มภาคภูมิ'},
    ]},
 ];
-let curStep=0, maxLv=1;
+let curStep=0, maxLv=1, EXP_LEVEL=1;
+const VISIBLE_LEVELS=3; // ทุกคนเห็นครบ 3 ระดับเสมอ ไม่ว่าจะอยู่เกณฑ์อายุงาน/ตำแหน่งใด
 const TH={1:5,2:4,3:4};
 const gv=id=>document.getElementById(id)?.value||'';
 const gc=id=>document.getElementById(id)?.checked||false;
 let ACTIVE_COMPS = COMPS;     // ชุดสมรรถนะที่กำลังประเมินอยู่ ณ ขณะนี้
 let PHASE = 'staff';           // 'staff' | 'exec' — ใช้ติดตามว่าตอนนี้กำลังประเมินแบบไหน
 let EXEC_LEVEL = 1;            // ระดับของผู้บริหาร (มาจากตำแหน่งงานที่เลือก ไม่ใช่อายุงาน)
-let LOCKED_LEVELS = {1:false,2:false,3:false};  // ระดับที่กดปุ่ม "ระดับถัดไป" ผ่านไปแล้ว -> ล็อกถาวร อ่านอย่างเดียว
-let STOPPED_AT = null;  // ถ้าผู้ใช้กด "ส่งผลเท่าที่ทำได้" จะเก็บว่าหยุดที่ระดับไหน (null = ไปครบตาม maxLv ปกติ)
+let LOCKED_LEVELS = null; // เลิกใช้ระบบล็อกระดับแล้ว (ทุกคนเห็นและติ๊กได้ครบ 3 ระดับเสมอ)
+let STOPPED_AT = null;    // เลิกใช้ (คงตัวแปรไว้เพื่อความเข้ากันได้ ไม่ได้ใช้งานจริงแล้ว)
+let SCROLLED_LEVELS = {1:false,2:false,3:false}; // กันไม่ให้เลื่อนจอซ้ำหลังจากเลื่อนไปแล้วครั้งหนึ่งต่อระดับ
 const getScore=(cid,lv)=>ACTIVE_COMPS.find(c=>c.id===cid)[`lv${lv}`].filter(it=>gc(it.id+'-'+lv)).length;
 const lvPassed=(cid,lv)=>getScore(cid,lv)>=TH[lv];
 const allLv1Pass=()=>ACTIVE_COMPS.every(c=>lvPassed(c.id,1));
@@ -527,7 +529,7 @@ function next(from){
     if(ft==='0'){
       // เฉพาะผู้ปฏิบัติการ — ไม่มีตำแหน่งงาน
       PHASE='staff'; ACTIVE_COMPS=COMPS;
-      LOCKED_LEVELS={1:false,2:false,3:false}; STOPPED_AT=null;
+      SCROLLED_LEVELS={1:false,2:false,3:false};
       maxLv=getLevelFromExp(gv('fe'));
       showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
     } else if(ft==='1'){
@@ -536,7 +538,7 @@ function next(from){
     } else {
       // ทั้งสองแบบ — เริ่มจากผู้ปฏิบัติการก่อนเสมอ (ไม่มีตำแหน่งงานในรอบนี้)
       PHASE='staff'; ACTIVE_COMPS=COMPS;
-      LOCKED_LEVELS={1:false,2:false,3:false}; STOPPED_AT=null;
+      SCROLLED_LEVELS={1:false,2:false,3:false};
       maxLv=getLevelFromExp(gv('fe'));
       showLevelPopup(maxLv, gv('fe'), function(){ goStep(1); });
     }
@@ -622,33 +624,25 @@ function showLevelPopup(lv, exp, onConfirm){
   };
   modal.style.display = 'flex';
 }
-function getCurrentLevel(){
-  // หาว่าตอนนี้ผู้ใช้กำลังทำระดับไหนอยู่ (ระดับแรกที่ยังไม่ถูกล็อกถาวร)
-  for(let l=1;l<=maxLv;l++){
-    if(!LOCKED_LEVELS[l]) return l;
-  }
-  return maxLv; // ล็อกหมดทุกระดับแล้ว (ไม่ควรเกิดขึ้นเพราะ submit ไปแล้ว)
-}
 function lvAllPass(l){
   const th=TH[l];
   return ACTIVE_COMPS.every(c=>getScore(c.id,l)>=th);
 }
 function renderAssess(){
-  const lv=maxLv;
-  const curLv=getCurrentLevel();
   let html='';
 
-  // แสดงทุกระดับตั้งแต่ 1 ถึง curLv (ระดับที่ล็อกแล้วโชว์แบบอ่านอย่างเดียว, ระดับปัจจุบันโชว์แบบติ๊กได้)
-  for(let l=1;l<=curLv;l++){
-    const isLocked = LOCKED_LEVELS[l];
+  // แสดงครบทั้ง 3 ระดับเสมอ ไม่ว่าเกณฑ์อายุงาน/ตำแหน่งของผู้ประเมินจะอยู่ระดับใด
+  // ระดับที่เกินเกณฑ์ของตัวเอง (l > maxLv) ยังติ๊กได้ตามปกติ แต่จะไม่ถูกนำไปนับผ่าน/ไม่ผ่าน หรือบันทึกผลตอนส่งจริง
+  for(let l=1;l<=3;l++){
     const th=TH[l];
-    html+=`<div class="card" style="margin-bottom:10px${isLocked?';opacity:.65':''}">`;
-    html+=`<div style="padding:10px 18px;background:${isLocked?'#F3F4F6':'#EFF6FF'};border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center">
-      <span class="badge b${l}">ระดับ ${l}${isLocked?' (บันทึกแล้ว — ดูอย่างเดียว)':''}</span>
+    const withinOwnLevel = l<=maxLv;
+    html+=`<div class="card" style="margin-bottom:10px" id="lvcard-${l}">`;
+    html+=`<div style="padding:10px 18px;background:${withinOwnLevel?'#EFF6FF':'#F9FAFB'};border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center">
+      <span class="badge b${l}">ระดับ ${l}${withinOwnLevel?'':' (เกินเกณฑ์ของท่าน — ไม่บังคับ)'}</span>
       <span style="font-size:11px;color:#9CA3AF">เกณฑ์ผ่าน ${th}/5</span>
     </div>`;
 
-    ACTIVE_COMPS.forEach((comp,ci)=>{
+    ACTIVE_COMPS.forEach((comp)=>{
       const sc=getScore(comp.id,l),pass=sc>=th;
       const pcls=sc===0?'pl':(pass?'pp':'pf');
       const ptxt=sc===0?`0/${th}`:`${sc}/${th} ${pass?'✓':'✗'}`;
@@ -662,50 +656,21 @@ function renderAssess(){
         </div>`;
       comp[`lv${l}`].forEach(it=>{
         const checked = gc(it.id+'-'+l) ? 'checked' : '';
-        const dis = isLocked ? 'disabled' : '';
-        const rowStyle = isLocked ? 'opacity:.7' : '';
-        html+=`<div class="ind-row" id="row-${it.id}-${l}" style="${rowStyle}">
-          <input type="checkbox" class="chk" id="${it.id}-${l}" ${checked} ${dis} onchange="onTick('${comp.id}',${l})">
+        html+=`<div class="ind-row" id="row-${it.id}-${l}">
+          <input type="checkbox" class="chk" id="${it.id}-${l}" ${checked} onchange="onTick('${comp.id}',${l})">
           <div><div class="ind-name">${it.n}</div><div class="ind-desc">${it.d}</div></div>
         </div>`;
       });
       html+=`</div>`;
-
-      // ปุ่ม "ระดับถัดไป" และ "ส่งผลเท่าที่ทำได้" ใต้สมรรถนะสุดท้าย ของระดับปัจจุบันที่ยังไม่ล็อก
-      const isLastComp = ci===ACTIVE_COMPS.length-1;
-      if(isLastComp && !isLocked){
-        const canGoNext = lvAllPass(l);
-        const hasNextLevel = l<lv;
-        if(hasNextLevel){
-          const nextBtnStyle = canGoNext ? '' : 'background:#9CA3AF;cursor:not-allowed';
-          const stopBtnStyle = canGoNext ? 'background:#9CA3AF;color:#fff;cursor:not-allowed;border:none' : '';
-          html+=`<div style="padding:14px 18px;border-top:1px solid #F3F4F6">
-            <div style="display:flex;gap:10px">
-              <button class="btn-sec" id="btn-stop-lv-${l}" ${canGoNext?'disabled':''} style="flex:1;${stopBtnStyle}" onclick="confirmStopHere(${l})">📤 ส่งผลเท่าที่ทำได้</button>
-              <button class="btn-pri" id="btn-next-lv-${l}" ${canGoNext?'':'disabled'} style="flex:1;${nextBtnStyle}" onclick="confirmNextLevel(${l})">ระดับถัดไป →</button>
-            </div>
-            ${canGoNext?'':'<div style="font-size:11px;color:#9CA3AF;margin-top:6px">ต้องผ่านเกณฑ์ขั้นต่ำครบทั้ง 4 สมรรถนะก่อนจึงจะกด \"ระดับถัดไป\" ได้</div>'}
-          </div>`;
-        }
-      }
     });
+
+    if(!withinOwnLevel){
+      html+=`<div style="padding:10px 18px;font-size:11px;color:#9CA3AF;border-top:1px solid #F3F4F6">ระดับนี้สูงกว่าเกณฑ์ของท่าน ท่านสามารถติ๊กเพื่อดูตัวอย่างเกณฑ์ระดับถัดไปได้ แต่ผลของระดับนี้จะไม่ถูกนับหรือบันทึกลงระบบ</div>`;
+    }
     html+=`</div>`;
   }
 
   document.getElementById('comp-wrap').innerHTML=html;
-}
-function confirmNextLevel(l){
-  if(!lvAllPass(l)) return;
-  LOCKED_LEVELS[l]=true;
-  renderAssess();
-  scrollToTop();
-}
-function confirmStopHere(l){
-  if(lvAllPass(l)) return;
-  if(!confirm('ท่านยังไม่ผ่านเกณฑ์ขั้นต่ำของระดับ '+l+' ต้องการส่งผลเท่าที่ทำได้ (ถึงระดับ '+l+' เท่านั้น ไม่รวมระดับที่สูงกว่า) ใช่หรือไม่?')) return;
-  STOPPED_AT = l;
-  LOCKED_LEVELS[l]=true;
-  goStep(2);
 }
 function saveState(){
   var state={};
@@ -732,7 +697,7 @@ function scrollToTop(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function onTick(cid,lv){
-  // อัปเดต pill คะแนนของทุกสมรรถนะในระดับนี้ และสลับสถานะปุ่ม "ระดับถัดไป" / "ส่งผลเท่าที่ทำได้" ตามเกณฑ์
+  // อัปเดต pill คะแนนของทุกสมรรถนะในระดับนี้
   ACTIVE_COMPS.forEach(comp=>{
     const sc=getScore(comp.id,lv),th=TH[lv],pass=sc>=th;
     const pillEl=document.querySelector(`#lb-${comp.id}-${lv} .pill`);
@@ -741,21 +706,13 @@ function onTick(cid,lv){
       pillEl.textContent = sc===0?`0/${th}`:`${sc}/${th} ${pass?'✓':'✗'}`;
     }
   });
-  const can=lvAllPass(lv);
-  const nextBtn=document.getElementById('btn-next-lv-'+lv);
-  const stopBtn=document.getElementById('btn-stop-lv-'+lv);
-  if(nextBtn){
-    nextBtn.disabled=!can;
-    nextBtn.style.cssText = 'flex:1;'+(can ? '' : 'background:#9CA3AF;cursor:not-allowed');
-  }
-  if(stopBtn){
-    stopBtn.disabled=can;
-    stopBtn.style.cssText = 'flex:1;'+(can ? 'background:#9CA3AF;color:#fff;cursor:not-allowed;border:none' : '');
-  }
-  const hintWrap = nextBtn ? nextBtn.closest('div[style*="border-top"]') : null;
-  if(hintWrap){
-    const hint = hintWrap.querySelector('div:last-child');
-    if(hint && hint!==hintWrap.firstElementChild) hint.style.display = can ? 'none' : '';
+  // เมื่อผ่านเกณฑ์ครบทั้ง 4 สมรรถนะของระดับนี้แล้ว ให้เลื่อนจอไปยังระดับถัดไปให้อัตโนมัติ (เลื่อนครั้งเดียวต่อระดับ)
+  if(lv<3 && lvAllPass(lv) && !SCROLLED_LEVELS[lv]){
+    SCROLLED_LEVELS[lv]=true;
+    setTimeout(()=>{
+      const nextCard=document.getElementById('lvcard-'+(lv+1));
+      if(nextCard) nextCard.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 350);
   }
 }
 function refreshPills(cid){
@@ -777,13 +734,12 @@ function refreshPills(cid){
   }
 }
 function renderSum(){
-  const lv = STOPPED_AT || maxLv;
+  const lv = maxLv; // สรุปผลนับเฉพาะระดับตามเกณฑ์ของตนเองเท่านั้น แม้จะติ๊กระดับที่สูงกว่าไว้ดูตัวอย่างก็ตาม
   let allPass=true;
   const posLabel = {1:'หัวหน้างาน/รองหัวหน้า',2:'หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย',3:'หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ'};
   const phaseTitle = PHASE==='exec' ? 'สรุปผลการประเมินสมรรถนะหลัก — ผู้บริหาร' : 'สรุปผลการประเมินสมรรถนะหลัก — ผู้ปฏิบัติการ';
   let html=`<div class="card card-pad" style="margin-bottom:10px">
     <div style="font-size:14px;font-weight:600;margin-bottom:10px">${phaseTitle}</div>
-    ${STOPPED_AT ? `<div style="background:#FEF9C3;border:1px solid #FDE047;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#713F12">⚠️ ส่งผลเท่าที่ทำได้ — ไม่ผ่านเกณฑ์ขั้นต่ำของระดับ ${STOPPED_AT} จึงไม่มีข้อมูลระดับที่สูงกว่านี้</div>` : ''}
     <div class="sum-box">
       <div class="sum-row"><span>ชื่อ-นามสกุล</span><span style="font-weight:600">${gv('fp')}${gv('ff')} ${gv('fl')}</span></div>
       <div class="sum-row"><span>กลุ่มงาน</span><span>${gv('fd')}</span></div>
@@ -822,7 +778,7 @@ async function submitData(){
   const btn=document.getElementById('btn-submit');
   btn.disabled=true;
   document.getElementById('overlay').classList.add('show');
-  const lv = STOPPED_AT || maxLv;  // ระดับจริงที่จะส่ง — ถ้าหยุดกลางทางจะตัดที่ STOPPED_AT
+  const lv = maxLv;  // ระดับจริงที่จะบันทึก — เฉพาะตามเกณฑ์ของตนเองเท่านั้น (ระดับที่เกินเกณฑ์แม้ติ๊กไว้จะไม่ถูกส่ง)
   const ft = gv('fformtype'); // 0=ปฏิบัติการ, 1=บริหาร, 2=ทั้งสอง
   const formNames = {0:'ผู้ปฏิบัติการ',1:'ผู้บริหาร',2:'ผู้ปฏิบัติการและผู้บริหาร'};
   const payload={
@@ -890,7 +846,7 @@ function askExecPositionThenContinue(afterStaffSubmit){
     document.getElementById('fexecpos').value = pos;
     modal.style.display='none';
     PHASE='exec'; ACTIVE_COMPS=EXEC_COMPS;
-    LOCKED_LEVELS={1:false,2:false,3:false}; STOPPED_AT=null;
+    SCROLLED_LEVELS={1:false,2:false,3:false};
     maxLv=parseInt(pos); EXEC_LEVEL=maxLv;
     showExecLevelPopup(maxLv, function(){
       curStep=1;
@@ -902,7 +858,7 @@ function askExecPositionThenContinue(afterStaffSubmit){
 function resetForm(){
   document.getElementById('success-overlay').classList.remove('show');
   PHASE='staff'; ACTIVE_COMPS=COMPS;
-  LOCKED_LEVELS={1:false,2:false,3:false}; STOPPED_AT=null;
+  SCROLLED_LEVELS={1:false,2:false,3:false};
   document.getElementById('fformtype').value='';
   document.getElementById('fexecpos').value='';
   goStep(0);
