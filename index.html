@@ -734,7 +734,7 @@ function refreshPills(cid){
   }
 }
 function renderSum(){
-  const lv = maxLv; // สรุปผลนับเฉพาะระดับตามเกณฑ์ของตนเองเท่านั้น แม้จะติ๊กระดับที่สูงกว่าไว้ดูตัวอย่างก็ตาม
+  const lv = maxLv; // เกณฑ์ที่ต้องผ่านจริงของตนเอง (ใช้ตัดสิน ผ่าน/ไม่ผ่าน) — แต่จะแสดงครบทุกระดับ (1-3) เสมอเพื่อให้เห็นข้อมูล
   let allPass=true;
   const posLabel = {1:'หัวหน้างาน/รองหัวหน้า',2:'หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย',3:'หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ'};
   const phaseTitle = PHASE==='exec' ? 'สรุปผลการประเมินสมรรถนะหลัก — ผู้บริหาร' : 'สรุปผลการประเมินสมรรถนะหลัก — ผู้ปฏิบัติการ';
@@ -746,17 +746,25 @@ function renderSum(){
       ${PHASE==='exec'
         ? `<div class="sum-row"><span>ตำแหน่งงาน</span><span>${posLabel[maxLv]||''}</span></div>`
         : `<div class="sum-row"><span>อายุงาน</span><span>${gv('fe')} ปี</span></div>`}
-      <div class="sum-row"><span>ระดับที่ประเมิน</span><span>1–${lv}</span></div>
+      <div class="sum-row"><span>ระดับที่ต้องผ่านตามเกณฑ์</span><span>1–${lv}</span></div>
       <div class="sum-row"><span>หัวหน้า</span><span>${gv('fs')}</span></div>
     </div>`;
   ACTIVE_COMPS.forEach(comp=>{
     let compPass=true,rows='';
-    for(let l=1;l<=lv;l++){
+    // แสดงครบทั้ง 3 ระดับเสมอ ไม่ว่าจะมีการประเมินหรือไม่ก็ตาม — ระดับที่เกินเกณฑ์ตนเองจะไม่ถูกนับผ่าน/ไม่ผ่าน
+    for(let l=1;l<=3;l++){
       const sc=getScore(comp.id,l),th=TH[l],pass=sc>=th;
-      if(!pass) compPass=false;
+      const withinOwnLevel=l<=lv;
+      let statusHtml;
+      if(withinOwnLevel){
+        if(!pass) compPass=false;
+        statusHtml=`<span class="${pass?'tpass':'tfail'}">${sc}/${th} ${pass?'ผ่าน':'ไม่ผ่าน'}</span>`;
+      } else {
+        statusHtml=`<span style="color:#9CA3AF;font-weight:600">${sc}/${th} (เกินเกณฑ์ — ไม่บังคับ)</span>`;
+      }
       rows+=`<div class="sum-row">
         <span style="padding-left:8px"><span class="badge b${l}" style="margin-right:4px">ระดับ ${l}</span></span>
-        <span class="${pass?'tpass':'tfail'}">${sc}/${th} ${pass?'ผ่าน':'ไม่ผ่าน'}</span>
+        ${statusHtml}
       </div>`;
     }
     if(!compPass) allPass=false;
