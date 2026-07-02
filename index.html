@@ -812,8 +812,8 @@ function renderSum(){
     </div>`;
   });
   const cls=allPass?'res-ok':'res-no';
-  const title=allPass?'✅ ผ่านการประเมินทุกสมรรถนะ':'⚠️ มีสมรรถนะที่ต้องพัฒนาเพิ่มเติม';
-  const sub=allPass?'เท่าระดับที่คาดหวังหรือมากกว่าระดับที่คาดหวัง':'น้อยกว่าระดับที่คาดหวัง ';
+  const title=allPass?'เท่าระดับที่คาดหวังหรือมากกว่าระดับที่คาดหวัง':'น้อยกว่าระดับที่คาดหวัง';
+  const sub=allPass?' ✅ผ่านการประเมินทุกสมรรถนะในระดับที่คาดหวัง':' ⚠️มีสมรรถนะที่ต้องพัฒนาเพิ่มเติม';
   html+=`<div class="res-box ${cls}">
     <div style="font-size:14px;font-weight:600">${title}</div>
     <div style="font-size:12px;margin-top:4px">${sub}</div>
