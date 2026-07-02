@@ -13,7 +13,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
 .hdr h1{font-size:20px;font-weight:600}
 .hdr p{font-size:14px;opacity:.75;margin-top:4px}
 .steps{display:flex;gap:6px;margin-bottom:10px}
-.sb{flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;background:#fff;border-radius:8px;font-size:14px;color:#6B7280;cursor:pointer;text-align:center;transition:all .2s;font-family:'Sarabun',sans-serif}
+.sb{flex:1;padding:8px 4px;border:1.5px solid #E5E7EB;background:#fff;border-radius:8px;font-size:14px;color:#6B7280;cursor:default;text-align:center;transition:all .2s;font-family:'Sarabun',sans-serif}
 .sb.active{border-color:#1B3A6B;background:#EFF6FF;color:#1B3A6B;font-weight:600}
 .sb.done{border-color:#1D9E75;color:#1D9E75}
 .prog{background:#fff;border-radius:10px;padding:12px 18px;margin-bottom:10px;border:1px solid #E5E7EB}
@@ -104,9 +104,9 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
   <p>Core Competency Assessment · ปีงบประมาณ 2569</p>
 </div>
 <div class="steps">
-  <button class="sb active" onclick="goStep(0)" id="sb0">1. ข้อมูลส่วนตัว</button>
-  <button class="sb" onclick="goStep(1)" id="sb1">2. ประเมินตนเอง</button>
-  <button class="sb" onclick="goStep(2)" id="sb2">3. สรุปผล</button>
+  <button class="sb active" id="sb0">1. ข้อมูลส่วนตัว</button>
+  <button class="sb" id="sb1">2. ประเมินตนเอง</button>
+  <button class="sb" id="sb2">3. สรุปผล</button>
 </div>
 <div class="prog">
   <div class="prog-row"><span id="prog-txt">กรอกข้อมูลส่วนตัวก่อนเริ่มประเมิน</span><span id="prog-pct">0%</span></div>
