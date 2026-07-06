@@ -582,7 +582,7 @@ function next(from){
   goStep(from+1);
 }
 function showExecLevelPopup(lv, onConfirm){
-  const posText = {1:'1. หัวหน้างาน/รองหัวหน้า',2:'2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย',3:'3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ'}[lv];
+  const posText = {1:'1. หัวหน้างาน/รองหัวหน้า',2:'2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย/ผู้ช่วยฝ่ายต่างๆ',3:'3. หัวหน้ากลุ่มภารกิจ/รองผู้อำนวยการ'}[lv];
   const lvDesc = lv===1
     ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1</strong> เกณฑ์ผ่าน <strong>5/5</strong> ทุกสมรรถนะ'
     : lv===2
@@ -677,20 +677,15 @@ function renderAssess(){
     html+=`<div class="card" style="margin-bottom:10px" id="lvcard-${l}">`;
     html+=`<div style="padding:14px 18px;background:${withinOwnLevel?'#EFF6FF':'#F9FAFB'};border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center">
       <span class="badge b${l}" style="font-size:22px;padding:6px 16px;font-weight:700">ระดับ ${l}${withinOwnLevel?'':' <span style=\"font-size:13px;font-weight:400\">(เกินเกณฑ์ของท่าน — ไม่บังคับ)</span>'}</span>
-      <span style="font-size:15px;color:#6B7280;font-weight:600">เกณฑ์ผ่าน ${th}/5</span>
     </div>`;
 
     ACTIVE_COMPS.forEach((comp)=>{
-      const sc=getScore(comp.id,l),pass=sc>=th;
-      const pcls=sc===0?'pl':(pass?'pp':'pf');
-      const ptxt=sc===0?`0/${th}`:`${sc}/${th} ${pass?'✓':'✗'}`;
       html+=`<div class="lv-block" id="lb-${comp.id}-${l}">
         <div class="lv-bar">
           <div class="lv-label">
             <span class="comp-dot" style="background:${comp.dot};display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px"></span>
             <span style="font-size:14px">${comp.name}</span>
           </div>
-          <span class="pill ${pcls}">${ptxt}</span>
         </div>`;
       comp[`lv${l}`].forEach(it=>{
         const checked = gc(it.id+'-'+l) ? 'checked' : '';
@@ -735,15 +730,6 @@ function scrollToTop(){
   window.scrollTo({top:0, behavior:'smooth'});
 }
 function onTick(cid,lv){
-  // อัปเดต pill คะแนนของทุกสมรรถนะในระดับนี้
-  ACTIVE_COMPS.forEach(comp=>{
-    const sc=getScore(comp.id,lv),th=TH[lv],pass=sc>=th;
-    const pillEl=document.querySelector(`#lb-${comp.id}-${lv} .pill`);
-    if(pillEl){
-      pillEl.className='pill '+(sc===0?'pl':(pass?'pp':'pf'));
-      pillEl.textContent = sc===0?`0/${th}`:`${sc}/${th} ${pass?'✓':'✗'}`;
-    }
-  });
   // เมื่อผ่านเกณฑ์ครบทั้ง 4 สมรรถนะของระดับนี้แล้ว ให้เลื่อนจอไปยังระดับถัดไปให้อัตโนมัติ (เลื่อนครั้งเดียวต่อระดับ)
   if(lv<3 && lvAllPass(lv) && !SCROLLED_LEVELS[lv]){
     SCROLLED_LEVELS[lv]=true;
@@ -774,7 +760,7 @@ function refreshPills(cid){
 function renderSum(){
   const lv = maxLv; // เกณฑ์ที่ต้องผ่านจริงของตนเอง (ใช้ตัดสิน ผ่าน/ไม่ผ่าน) — แต่จะแสดงครบทุกระดับ (1-3) เสมอเพื่อให้เห็นข้อมูล
   let allPass=true;
-  const posLabel = {1:'หัวหน้างาน/รองหัวหน้า',2:'หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย',3:'หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ'};
+  const posLabel = {1:'หัวหน้างาน/รองหัวหน้า',2:'หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย/ผู้ช่วยฝ่ายต่างๆ',3:'หัวหน้ากลุ่มภารกิจ/รองผู้อำนวยการ'};
   const phaseTitle = PHASE==='exec' ? 'สรุปผลการประเมินสมรรถนะหลัก — ผู้บริหาร' : 'สรุปผลการประเมินสมรรถนะหลัก — ผู้ปฏิบัติการ';
   let html=`<div class="card card-pad" style="margin-bottom:10px">
     <div style="font-size:14px;font-weight:600;margin-bottom:10px">${phaseTitle}</div>
@@ -883,8 +869,8 @@ function askExecPositionThenContinue(afterStaffSubmit){
         <select id="exec-ask-pos" style="width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:8px;font-size:15px;font-family:Sarabun,sans-serif;margin-bottom:16px">
           <option value="">— เลือกตำแหน่งงาน —</option>
           <option value="1">1. หัวหน้างาน/รองหัวหน้า</option>
-          <option value="2">2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย</option>
-          <option value="3">3. หัวหน้ากลุ่มภารกิจ, ผู้ช่วยฝ่ายต่างๆ/รองผู้อำนวยการ</option>
+          <option value="2">2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย/ผู้ช่วยฝ่ายต่างๆ</option>
+          <option value="3">3. หัวหน้ากลุ่มภารกิจ/รองผู้อำนวยการ</option>
         </select>
         <button id="exec-ask-confirm" style="width:100%;padding:12px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:Sarabun,sans-serif">ถัดไป →</button>
       </div>`;
