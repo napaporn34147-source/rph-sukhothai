@@ -678,7 +678,7 @@ function renderAssess(){
     const withinOwnLevel = l<=maxLv;
     html+=`<div class="card" style="margin-bottom:10px" id="lvcard-${l}">`;
     html+=`<div style="padding:14px 18px;background:${withinOwnLevel?'#EFF6FF':'#F9FAFB'};border-bottom:1px solid #E5E7EB;display:flex;justify-content:space-between;align-items:center">
-      <span class="badge b${l}" style="font-size:22px;padding:6px 16px;font-weight:700">ระดับ ${l}${withinOwnLevel?'':' <span style=\"font-size:13px;font-weight:400\">(เกินเกณฑ์ของท่าน — ไม่บังคับ)</span>'}</span>
+      <span class="badge b${l}" style="font-size:22px;padding:6px 16px;font-weight:700">ระดับ ${l}${withinOwnLevel?'':' <span style=\"font-size:13px;font-weight:400\">(เกินเกณฑ์ของท่าน — ไม่จำเป็นต้องประเมิน)</span>'}</span>
     </div>`;
 
     ACTIVE_COMPS.forEach((comp)=>{
