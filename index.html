@@ -830,6 +830,37 @@ function renderSum(){
   </div></div>`;
   document.getElementById('sum-wrap').innerHTML=html;
 }
+function jsonpCheckDup(empId, assessKind){
+  return new Promise((resolve)=>{
+    const cbName = 'jsonpCb_' + Date.now() + '_' + Math.floor(Math.random()*100000);
+    let settled = false;
+    const script = document.createElement('script');
+    const cleanup = ()=>{
+      delete window[cbName];
+      if(script.parentNode) script.parentNode.removeChild(script);
+    };
+    window[cbName] = function(data){
+      if(settled) return;
+      settled = true;
+      cleanup();
+      resolve(data);
+    };
+    script.src = SHEETS_URL + '?action=checkdup&empId=' + encodeURIComponent(empId) + '&assessKind=' + encodeURIComponent(assessKind) + '&callback=' + cbName;
+    script.onerror = function(){
+      if(settled) return;
+      settled = true;
+      cleanup();
+      resolve({status:'ok'}); // เชื่อมต่อไม่ได้ ให้ปล่อยผ่านไปก่อน (เซิร์ฟเวอร์ยังเช็คซ้ำอีกชั้นตอนบันทึกจริงอยู่ดี)
+    };
+    document.body.appendChild(script);
+    setTimeout(()=>{
+      if(settled) return;
+      settled = true;
+      cleanup();
+      resolve({status:'ok'});
+    }, 8000);
+  });
+}
 async function submitData(){
   const btn=document.getElementById('btn-submit');
   btn.disabled=true;
@@ -857,18 +888,20 @@ async function submitData(){
       payload.scores[comp.id][`lv${l}`]=comp[`lv${l}`].map(it=>gc(it.id+'-'+l)?1:0);
     }
   });
-  try {
-    const resp = await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const result = await resp.json().catch(()=>null);
-    document.getElementById('overlay').classList.remove('show');
 
-    if(result && result.status === 'duplicate'){
-      // รหัสพนักงานนี้เคยส่งแบบประเมินประเภทนี้ไปแล้ว — ไม่บันทึกซ้ำ
-      btn.disabled=false;
-      document.getElementById('dup-msg').textContent = result.msg || 'รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว ไม่สามารถส่งซ้ำได้';
-      document.getElementById('dup-overlay').classList.add('show');
-      return;
-    }
+  // ── เช็คว่าส่งซ้ำหรือไม่ก่อน (ผ่าน JSONP เพื่อเลี่ยงปัญหา CORS ข้ามโดเมน) ──
+  const dupCheck = await jsonpCheckDup(payload.empId, payload.assessKind);
+  if(dupCheck && dupCheck.status === 'duplicate'){
+    document.getElementById('overlay').classList.remove('show');
+    btn.disabled=false;
+    document.getElementById('dup-msg').textContent = dupCheck.msg || 'รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว ไม่สามารถส่งซ้ำได้';
+    document.getElementById('dup-overlay').classList.add('show');
+    return;
+  }
+
+  try {
+    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),mode:'no-cors'});
+    document.getElementById('overlay').classList.remove('show');
 
     if(ft==='2' && PHASE==='staff'){
       // ส่งแบบปฏิบัติการเสร็จแล้ว ถ้าเลือก "ทั้งสองแบบ" ให้ต่อด้วยแบบบริหารทันที
