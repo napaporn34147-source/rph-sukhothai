@@ -2,14 +2,14 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>แบบประเมินสมรรถนะหลัก — โรงพยาบาลสุโขทัย</title>
-<style> 
+<style>
 *{box-sizing:border-box;margin:0;padding:0}
 html{height:100%}body{min-height:100vh}
 body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size:18px}
 .app{max-width:100%;margin:0 auto;padding:20px;box-sizing:border-box;min-height:100vh}
-.hdr{background:#1B3A6B;border-radius:12px;padding:18px 22px;margin-bottom:12px;color:#fff} 
+.hdr{background:#1B3A6B;border-radius:12px;padding:18px 22px;margin-bottom:12px;color:#fff}
 .hdr h1{font-size:20px;font-weight:600}
 .hdr p{font-size:14px;opacity:.75;margin-top:4px}
 .steps{display:flex;gap:6px;margin-bottom:10px}
@@ -127,7 +127,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
           <option value="1">2. ประเมินสมรรถนะหลักสำหรับผู้บริหาร</option>
         </select>
         <div style="font-size:14px;color:#9CA3AF;margin-top:6px;line-height:1.6">
-          (แบบประเมินสมรรถนะหลักสำหรับผู้บริหาร(ข้อ 2.)ใช้สำหรับ หัวหน้างาน/รองหัวหน้า, หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย/ผู้ช่วยฝ่ายต่างๆ ,หัวหน้ากลุ่มภารกิจและ รองผู้อำนวยการ เท่านั้น)
+          (แบบประเมินสมรรถนะหลักสำหรับผู้บริหาร(ข้อ 2.)ใช้สำหรับ หัวหน้างาน/รองหัวหน้า,หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย,หัวหน้ากลุ่มภารกิจและ รองผู้อำนวยการ เท่านั้น)
         </div>
         <input type="hidden" id="fexecpos" value="">
       </div>
@@ -364,7 +364,7 @@ const EXEC_COMPS = [
      {id:'e3l1i2',n:'การกำหนดเป้าหมายหน่วยงาน',d:'กำหนดเป้าหมายการทำงานของหน่วยงานให้สอดคล้องกับวิสัยทัศน์และพันธกิจขององค์กร'},
      {id:'e3l1i3',n:'การปรับกระบวนงาน',d:'ริเริ่มสร้างสรรค์นวัตกรรม หรือปรับเปลี่ยนกระบวนงานภายในหน่วยงานให้สอดคล้องกับเป้าหมายขององค์กร'},
      {id:'e3l1i4',n:'การสร้างการมีส่วนร่วม',d:'สนับสนุนและจูงใจให้บุคลากรเข้าใจและเป็นส่วนหนึ่งในการขับเคลื่อนการเปลี่ยนแปลง'},
-     {id:'e3l1i5',n:'ความคล่องตัวของโครงสร้าง',d:'มีส่วนร่วมในการปรับโครงสร้างหน่วยงานภายในให้มีความคล่องตัว พร้อมรับมือการเปลี่ยนแปลงในอนาคต'},
+     {id:'e3l1i5',n:'ความคล่องตัวของโครงสร้าง',d:'ปรับโครงสร้างหน่วยงานภายในให้มีความคล่องตัว พร้อมรับมือการเปลี่ยนแปลงในอนาคต'},
    ],
    lv2:[
      {id:'e3l2i1',n:'การสนับสนุนกลยุทธ์',d:'ขับเคลื่อนการทำงานขององค์กรตามทิศทาง เป้าหมาย และกลยุทธ์ที่องค์กรกำหนด'},
@@ -849,8 +849,16 @@ async function submitData(){
     }
   });
   try {
-    await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),mode:'no-cors'});
+    const resp = await fetch(SHEETS_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const result = await resp.json().catch(()=>null);
     document.getElementById('overlay').classList.remove('show');
+
+    if(result && result.status === 'duplicate'){
+      // รหัสพนักงานนี้เคยส่งแบบประเมินประเภทนี้ไปแล้ว — ไม่บันทึกซ้ำ
+      btn.disabled=false;
+      alert('⚠️ '+(result.msg||'รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว ไม่สามารถส่งซ้ำได้'));
+      return;
+    }
 
     if(ft==='2' && PHASE==='staff'){
       // ส่งแบบปฏิบัติการเสร็จแล้ว ถ้าเลือก "ทั้งสองแบบ" ให้ต่อด้วยแบบบริหารทันที
