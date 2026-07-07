@@ -218,6 +218,15 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
     <button class="btn-pri" onclick="resetForm()" style="width:100%;margin-top:4px">ปิด</button>
   </div>
 </div>
+<!-- Duplicate submission -->
+<div class="overlay" id="dup-overlay">
+  <div class="modal">
+    <div style="font-size:48px;margin-bottom:12px">⚠️</div>
+    <h2 style="color:#991B1B">ส่งแบบประเมินซ้ำไม่ได้</h2>
+    <p id="dup-msg">รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว</p>
+    <button class="btn-pri" onclick="document.getElementById('dup-overlay').classList.remove('show')" style="width:100%;margin-top:4px;background:#991B1B">ปิด</button>
+  </div>
+</div>
 </div>
 </div>
 <script>
@@ -364,7 +373,7 @@ const EXEC_COMPS = [
      {id:'e3l1i2',n:'การกำหนดเป้าหมายหน่วยงาน',d:'กำหนดเป้าหมายการทำงานของหน่วยงานให้สอดคล้องกับวิสัยทัศน์และพันธกิจขององค์กร'},
      {id:'e3l1i3',n:'การปรับกระบวนงาน',d:'ริเริ่มสร้างสรรค์นวัตกรรม หรือปรับเปลี่ยนกระบวนงานภายในหน่วยงานให้สอดคล้องกับเป้าหมายขององค์กร'},
      {id:'e3l1i4',n:'การสร้างการมีส่วนร่วม',d:'สนับสนุนและจูงใจให้บุคลากรเข้าใจและเป็นส่วนหนึ่งในการขับเคลื่อนการเปลี่ยนแปลง'},
-     {id:'e3l1i5',n:'ความคล่องตัวของโครงสร้าง',d:'มีส่วนร่วมปรับโครงสร้างหน่วยงานภายในให้มีความคล่องตัว พร้อมรับมือการเปลี่ยนแปลงในอนาคต'},
+     {id:'e3l1i5',n:'ความคล่องตัวของโครงสร้าง',d:'ปรับโครงสร้างหน่วยงานภายในให้มีความคล่องตัว พร้อมรับมือการเปลี่ยนแปลงในอนาคต'},
    ],
    lv2:[
      {id:'e3l2i1',n:'การสนับสนุนกลยุทธ์',d:'ขับเคลื่อนการทำงานขององค์กรตามทิศทาง เป้าหมาย และกลยุทธ์ที่องค์กรกำหนด'},
@@ -856,7 +865,8 @@ async function submitData(){
     if(result && result.status === 'duplicate'){
       // รหัสพนักงานนี้เคยส่งแบบประเมินประเภทนี้ไปแล้ว — ไม่บันทึกซ้ำ
       btn.disabled=false;
-      alert('⚠️ '+(result.msg||'รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว ไม่สามารถส่งซ้ำได้'));
+      document.getElementById('dup-msg').textContent = result.msg || 'รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว ไม่สามารถส่งซ้ำได้';
+      document.getElementById('dup-overlay').classList.add('show');
       return;
     }
 
