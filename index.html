@@ -608,10 +608,10 @@ function next(from){
 function showExecLevelPopup(lv, onConfirm){
   const posText = {1:'1. หัวหน้างาน/รองหัวหน้า',2:'2. หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย/ผู้ช่วยฝ่ายต่างๆ',3:'3. หัวหน้ากลุ่มภารกิจ/รองผู้อำนวยการ'}[lv];
   const lvDesc = lv===1
-    ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1</strong> เกณฑ์ผ่าน <strong>5/5</strong> ทุกสมรรถนะ'
+    ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1</strong>'
     : lv===2
-    ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1 และ 2</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2 ผ่านเมื่อได้ <strong>4/5</strong>'
-    : 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1, 2 และ 3</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2–3 ผ่านเมื่อได้ <strong>4/5</strong>';
+    ? 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1 และ 2</strong>'
+    : 'ท่านต้องประเมินสมรรถนะผู้บริหาร <strong>ระดับ 1, 2 และ 3</strong>';
   const lvColor = lv===1?'#1E3A8A':lv===2?'#065F46':'#4C1D95';
   const lvBg    = lv===1?'#EFF6FF':lv===2?'#E1F5EE':'#F5F3FF';
   let modal = document.getElementById('exec-level-modal');
@@ -651,10 +651,10 @@ function showLevelPopup(lv, exp, onConfirm, posName){
       ? 'ระดับ 1–2 (อายุงาน 3–5 ปี)'
       : 'ระดับ 1–3 (อายุงานมากกว่า 5 ปี)');
   const lvDesc = lv===1
-    ? 'ท่านต้องประเมินสมรรถนะ <strong>ระดับ 1</strong> เกณฑ์ผ่าน <strong>5/5</strong> ทุกสมรรถนะ'
+    ? 'ท่านต้องประเมินสมรรถนะ <strong>ระดับ 1</strong>'
     : lv===2
-    ? 'ท่านต้องประเมิน <strong>ระดับ 1 และ 2</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2 ผ่านเมื่อได้ <strong>4/5</strong>'
-    : 'ท่านต้องประเมิน <strong>ระดับ 1, 2 และ 3</strong><br>ระดับ 1 ผ่านเมื่อได้ <strong>5/5</strong> · ระดับ 2–3 ผ่านเมื่อได้ <strong>4/5</strong>';
+    ? 'ท่านต้องประเมิน <strong>ระดับ 1 และ 2</strong>'
+    : 'ท่านต้องประเมิน <strong>ระดับ 1, 2 และ 3</strong>';
   const lvColor = lv===1?'#1E3A8A':lv===2?'#065F46':'#4C1D95';
   const lvBg    = lv===1?'#EFF6FF':lv===2?'#E1F5EE':'#F5F3FF';
   // สร้าง modal
