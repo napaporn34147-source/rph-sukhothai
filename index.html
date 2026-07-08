@@ -102,7 +102,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
 <div class="hdr">
   <h1>🏥 แบบประเมินสมรรถนะหลัก — โรงพยาบาลสุโขทัย</h1>
   <p>Core Competency Assessment · ปีงบประมาณ 2569</p>
-  <p style="font-size:12px;opacity:.6;margin-top:2px">ปรับปรุงล่าสุด: 6 กรกฎาคม 2569</p>
+  <p style="font-size:12px;opacity:.6;margin-top:2px" id="last-updated-txt">ปรับปรุงล่าสุด: ...</p>
 </div>
 
 <div class="steps">
@@ -197,7 +197,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
 <div id="p2" style="display:none">
   <div id="sum-wrap"></div>
   <div class="action-bar">
-    <button class="btn-sec" onclick="goStep(1)">← ย้อนกลับ</button>
+    <button class="btn-sec" disabled style="opacity:.5;cursor:not-allowed">← ย้อนกลับ</button>
     <button class="btn-pri" id="btn-submit" onclick="submitData()">✓ บันทึกส่งหัวหน้า</button>
   </div>
 </div>
@@ -223,7 +223,7 @@ body{font-family:'Sarabun',sans-serif;background:#F3F4F6;color:#111827;font-size
   <div class="modal">
     <div style="font-size:48px;margin-bottom:12px">⚠️</div>
     <h2 style="color:#991B1B">ส่งแบบประเมินซ้ำไม่ได้</h2>
-    <p id="dup-msg">รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว หากยังไม่ได้ทำแบบประเมินกรุณาติดต่อศูนย์คอม โทร.5035</p>
+    <p id="dup-msg">รหัสพนักงานนี้เคยส่งแบบประเมินนี้ไปแล้ว</p>
     <button class="btn-pri" onclick="document.getElementById('dup-overlay').classList.remove('show')" style="width:100%;margin-top:4px;background:#991B1B">ปิด</button>
   </div>
 </div>
@@ -373,7 +373,7 @@ const EXEC_COMPS = [
      {id:'e3l1i2',n:'การกำหนดเป้าหมายหน่วยงาน',d:'กำหนดเป้าหมายการทำงานของหน่วยงานให้สอดคล้องกับวิสัยทัศน์และพันธกิจขององค์กร'},
      {id:'e3l1i3',n:'การปรับกระบวนงาน',d:'ริเริ่มสร้างสรรค์นวัตกรรม หรือปรับเปลี่ยนกระบวนงานภายในหน่วยงานให้สอดคล้องกับเป้าหมายขององค์กร'},
      {id:'e3l1i4',n:'การสร้างการมีส่วนร่วม',d:'สนับสนุนและจูงใจให้บุคลากรเข้าใจและเป็นส่วนหนึ่งในการขับเคลื่อนการเปลี่ยนแปลง'},
-     {id:'e3l1i5',n:'ความคล่องตัวของโครงสร้าง',d:'มีส่วนร่วมปรับโครงสร้างหน่วยงานภายในให้มีความคล่องตัว พร้อมรับมือการเปลี่ยนแปลงในอนาคต'},
+     {id:'e3l1i5',n:'ความคล่องตัวของโครงสร้าง',d:'ปรับโครงสร้างหน่วยงานภายในให้มีความคล่องตัว พร้อมรับมือการเปลี่ยนแปลงในอนาคต'},
    ],
    lv2:[
      {id:'e3l2i1',n:'การสนับสนุนกลยุทธ์',d:'ขับเคลื่อนการทำงานขององค์กรตามทิศทาง เป้าหมาย และกลยุทธ์ที่องค์กรกำหนด'},
@@ -782,8 +782,7 @@ function refreshPills(cid){
   }
 }
 function renderSum(){
-  const lv = maxLv; // เกณฑ์ที่ต้องผ่านจริงของตนเอง (ใช้ตัดสิน ผ่าน/ไม่ผ่าน) — แต่จะแสดงครบทุกระดับ (1-3) เสมอเพื่อให้เห็นข้อมูล
-  let allPass=true;
+  const lv = maxLv; // เกณฑ์ที่ต้องผ่านจริงของตนเอง — แต่จะแสดงครบทุกระดับ (1-3) เสมอเพื่อให้เห็นข้อมูล
   const posLabel = {1:'หัวหน้างาน/รองหัวหน้า',2:'หัวหน้ากลุ่มงาน/หัวหน้าหอผู้ป่วย/ผู้ช่วยฝ่ายต่างๆ',3:'หัวหน้ากลุ่มภารกิจ/รองผู้อำนวยการ'};
   const phaseTitle = PHASE==='exec' ? 'สรุปผลการประเมินสมรรถนะหลัก — ผู้บริหาร' : 'สรุปผลการประเมินสมรรถนะหลัก — ผู้ปฏิบัติการ';
   let html=`<div class="card card-pad" style="margin-bottom:10px">
@@ -798,37 +797,36 @@ function renderSum(){
       <div class="sum-row"><span>หัวหน้า</span><span>${gv('fs')}</span></div>
     </div>`;
   ACTIVE_COMPS.forEach(comp=>{
-    let compPass=true,rows='';
-    // แสดงครบทั้ง 3 ระดับเสมอ ไม่ว่าจะมีการประเมินหรือไม่ก็ตาม — ระดับที่เกินเกณฑ์ตนเองจะไม่ถูกนับผ่าน/ไม่ผ่าน
+    let rows='';
+    // แสดงครบทั้ง 3 ระดับเสมอ — บอกแค่คะแนนที่ได้ ไม่บอกผ่าน/ไม่ผ่าน และใช้สีเดียวกันทุกกรณี
     for(let l=1;l<=3;l++){
-      const sc=getScore(comp.id,l),th=TH[l],pass=sc>=th;
-      const withinOwnLevel=l<=lv;
-      let statusHtml;
-      if(withinOwnLevel){
-        if(!pass) compPass=false;
-        statusHtml=`<span class="${pass?'tpass':'tfail'}">${sc}/${th} ${pass?'ผ่าน':'ไม่ผ่าน'}</span>`;
-      } else {
-        statusHtml=`<span style="color:#9CA3AF;font-weight:600">${sc}/${th} (เกินเกณฑ์ — ไม่บังคับ)</span>`;
-      }
+      const sc=getScore(comp.id,l),th=TH[l];
       rows+=`<div class="sum-row">
         <span style="padding-left:8px"><span class="badge b${l}" style="margin-right:4px">ระดับ ${l}</span></span>
-        ${statusHtml}
+        <span style="color:#374151;font-weight:600">${sc}/${th}</span>
       </div>`;
     }
-    if(!compPass) allPass=false;
     html+=`<div style="margin-bottom:8px">
       <div style="font-size:11px;font-weight:600;color:#6B7280;padding:4px 0">${comp.name}</div>
       <div class="sum-box" style="padding:8px 12px">${rows}</div>
     </div>`;
   });
-  const cls=allPass?'res-ok':'res-no';
-  const title=allPass?'   เท่าระดับที่คาดหวังหรือมากกว่าระดับที่คาดหวัง':'   น้อยกว่าระดับที่คาดหวัง';
-  const sub=allPass?' ✅ผ่านการประเมินทุกสมรรถนะในระดับที่คาดหวัง':' ⚠️มีสมรรถนะที่ต้องพัฒนาเพิ่มเติม';
-  html+=`<div class="res-box ${cls}">
-    <div style="font-size:14px;font-weight:600">${title}</div>
-    <div style="font-size:12px;margin-top:4px">${sub}</div>
-  </div></div>`;
+  html+=`</div>`;
   document.getElementById('sum-wrap').innerHTML=html;
+}
+function getThaiTimestamp(){
+  // แปลงเวลาปัจจุบันเป็นเวลาไทย (UTC+7) แล้ว format เป็นข้อความล้วน
+  // เพื่อให้ Google Sheet เก็บ/แสดงเป็นเวลาไทยตรงๆ โดยไม่ต้องพึ่ง timezone setting ของสเปรดชีต
+  const now = new Date();
+  const thaiTime = new Date(now.getTime() + 7*60*60*1000);
+  const pad = n => String(n).padStart(2,'0');
+  const y  = thaiTime.getUTCFullYear();
+  const mo = pad(thaiTime.getUTCMonth()+1);
+  const d  = pad(thaiTime.getUTCDate());
+  const hh = pad(thaiTime.getUTCHours());
+  const mi = pad(thaiTime.getUTCMinutes());
+  const ss = pad(thaiTime.getUTCSeconds());
+  return `${y}-${mo}-${d} ${hh}:${mi}:${ss}`;
 }
 function jsonpCheckDup(empId, assessKind){
   return new Promise((resolve)=>{
@@ -869,7 +867,7 @@ async function submitData(){
   const ft = gv('fformtype'); // 0=ปฏิบัติการ, 1=บริหาร, 2=ทั้งสอง
   const formNames = {0:'ผู้ปฏิบัติการ',1:'ผู้บริหาร',2:'ผู้ปฏิบัติการและผู้บริหาร'};
   const payload={
-    timestamp: new Date().toISOString(),
+    timestamp: getThaiTimestamp(),
     empId: gv('fi'), prefix: gv('fp'),
     fname: gv('ff'), lname: gv('fl'),
     dept: gv('fd'), exp: gv('fe'),
@@ -965,7 +963,19 @@ function resetForm(){
   goStep(0);
   document.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
 }
+function showLastUpdated(){
+  // แสดงวันที่ปัจจุบัน (เวลาไทย) แบบเรียลไทม์ทุกครั้งที่เปิดหน้า แทนวันที่ตายตัวที่ต้องมาแก้โค้ดเอง
+  const thaiMonths = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const now = new Date();
+  const thaiTime = new Date(now.getTime() + 7*60*60*1000);
+  const d = thaiTime.getUTCDate();
+  const m = thaiMonths[thaiTime.getUTCMonth()];
+  const y = thaiTime.getUTCFullYear() + 543; // แปลง ค.ศ. เป็น พ.ศ.
+  const el = document.getElementById('last-updated-txt');
+  if(el) el.textContent = `ปรับปรุงล่าสุด: ${d} ${m} ${y}`;
+}
 updateProg();
+showLastUpdated();
 </script>
 </body>
 </html>
